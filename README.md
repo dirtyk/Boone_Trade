@@ -38,3 +38,12 @@ node scripts/update-values.js "https://sports.yahoo.com/fantasy/article/2026-tra
 - Sleeper import: once a league is loaded, "You get" suggests any player in the league (picking one
   sets the trade partner) and "You give" suggests only your roster; full rosters still expand/collapse
 - Trade is saved in the URL hash, so you can share a link to a specific trade
+- Suggestions: **Even it out** (players that close the value gap), plus **Fair** (95–107%),
+  **Aggressive** (110–130%) and **Lowball** (72–90%) offers built from your roster for whatever is
+  in "You get". Each extra player in a package adds a 5% consolidation premium, and players at your
+  weakest position are avoided when possible.
+- Trade finder: rates every team's healthy starters by YTD points per game (Sleeper season stats,
+  weighted by your league's lineup slots) against the league median, pre-selects your weakest
+  position, and suggests trades with teams that are deep there and thin where you're strong.
+  Losing teams rank higher as likely sellers; injured players (IR/Out/Doubtful/PUP/Sus) are only
+  pitched to winning teams, who can afford to wait.

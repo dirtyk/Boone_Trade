@@ -149,6 +149,27 @@
     border: 1px dashed var(--border); background: none; color: var(--accent); font-weight: 600; cursor: pointer;
   }
   .roster { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .inj { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 5px; vertical-align: 2px; background: #4a1f1c; color: #ff9c94; }
+  .inj.q { background: #47391a; color: #ffd27a; }
+  .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .tools .btn { width: 100%; }
+  .hint { color: var(--muted); font-size: 14px; margin-top: 8px; }
+  .sugs { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+  .sug { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .sug .line { display: flex; gap: 8px; align-items: baseline; font-size: 15px; }
+  .sug .line .lbl { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; width: 34px; flex: none; }
+  .sug .line .who { flex: 1; min-width: 0; }
+  .sug .line .sum { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sug .head { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; margin-bottom: 6px; }
+  .sug .head .rec { color: var(--muted); font-weight: 600; font-size: 13px; white-space: nowrap; }
+  .sug ul.why { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+  .sug .act { margin-top: 8px; display: flex; justify-content: flex-end; }
+  .sug .act .btn { min-height: 40px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); background: rgba(76,154,255,.18); }
+  .chip .pct { font-variant-numeric: tabular-nums; margin-left: 4px; }
+  .chip .pct.lo { color: var(--lose); } .chip .pct.hi { color: var(--win); }
   footer { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0 20px; }
   footer a { color: var(--muted); }
 </style>
@@ -195,6 +216,22 @@
     <div class="big" id="verdict-big"></div>
     <div class="sub" id="verdict-sub"></div>
     <div class="note" id="consolidation" hidden></div>
+  </section>
+
+  <section class="card" id="tools">
+    <div class="side-head"><h2>Suggestions</h2></div>
+    <div class="tools">
+      <button class="btn" data-tool="even">Even it out</button>
+      <button class="btn" data-tool="fair">Fair offer</button>
+      <button class="btn" data-tool="over">Aggressive offer</button>
+      <button class="btn" data-tool="low">Lowball offer</button>
+    </div>
+    <div id="tool-out"></div>
+  </section>
+
+  <section class="card" id="finder">
+    <div class="side-head"><h2>Trade finder</h2></div>
+    <div id="finder-body"><div class="hint">Load your Sleeper league to find trades.</div></div>
   </section>
 
   <details class="card" id="sleeper">
@@ -304,7 +341,11 @@
   }
   $$('[data-scoring]').forEach((b) => b.addEventListener('click', () => { settings.scoring = b.dataset.scoring; saveSettings(); }));
   $$('[data-qb]').forEach((b) => b.addEventListener('click', () => { settings.qb = b.dataset.qb; saveSettings(); }));
-  function saveSettings() { store.set('btc.settings', settings); syncToggles(); render(); refreshSearches(); }
+  function saveSettings() {
+    store.set('btc.settings', settings); syncToggles(); render(); refreshSearches();
+    $('#tool-out').innerHTML = ''; toolSig = null; // values changed
+    if (finder.results) { finder.results = null; renderFinder(); }
+  }
 
   // ---------- trade edits ----------
   function sideOf(id) { return state.get.includes(id) ? 'get' : state.give.includes(id) ? 'give' : null; }
@@ -321,7 +362,7 @@
     const team = showOwner && teamOf(idOf(p));
     return `<li><button class="row${on ? ' on' : ''}" data-id="${esc(idOf(p))}">
       <span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>
-      <span class="name">${esc(p.name)}${team ? `<small>${esc(team.name)}</small>` : ''}</span>
+      <span class="name">${esc(p.name)}${injBadge(idOf(p))}${team ? `<small>${esc(team.name)}</small>` : ''}</span>
       <span class="val">${valueOf(p)}</span>
       ${removable ? '<span class="x" aria-label="Remove">×</span>' : ''}
     </button></li>`;
@@ -410,6 +451,7 @@
       renderRoster(side);
     }
     renderVerdict();
+    renderTools();
     writeHash();
   }
 
@@ -513,22 +555,25 @@
     ownerOf: new Map(),  // value id -> roster_id
     myTeam: null,        // your roster_id
     partner: null,       // trade partner's roster_id
+    info: new Map(),     // value id -> rostered player info { pid, inj, out, ppg }
+    league: null,
   };
   const teamOf = (id) => sl.teams.get(sl.ownerOf.get(id));
 
   // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE map for a day.
   async function sleeperPlayers() {
     if (sl.playerMap) return sl.playerMap;
-    const cached = store.get('btc.slPlayers', null);
+    const cached = store.get('btc.slPlayers2', null);
     if (cached && Date.now() - cached.at < 24 * 3600e3) return (sl.playerMap = cached.map);
     slStatus('Downloading Sleeper player list (one-time, ~5 MB)…');
     const all = await getJson(`${SL}/players/nfl`);
     const map = {};
     for (const [id, p] of Object.entries(all)) {
       if (!['QB', 'RB', 'WR', 'TE'].includes(p.position)) continue;
-      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position];
+      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position, p.injury_status || ''];
     }
-    store.set('btc.slPlayers', { at: Date.now(), map });
+    try { localStorage.removeItem('btc.slPlayers'); } catch { /* old cache format */ }
+    store.set('btc.slPlayers2', { at: Date.now(), map });
     return (sl.playerMap = map);
   }
 
@@ -537,8 +582,6 @@
     const p = cands.find((c) => c.pos === pos) || cands[0];
     return p ? idOf(p) : null;
   }
-
-  $('#sl-league').addEventListener('change', (e) => e.target.value && loadLeague(e.target.value));
 
   $('#sl-load').addEventListener('click', () => loadUser());
   async function loadUser() {
@@ -577,6 +620,8 @@
         getJson(`${SL}/league/${leagueId}/users`),
       ]);
       const pmap = await sleeperPlayers();
+      const stats = await sleeperStats(league.season, pmap);
+      sl.league = league;
 
       // Match the toggles to the league's format.
       const rec = league?.scoring_settings?.rec;
@@ -585,16 +630,23 @@
       store.set('btc.settings', settings); syncToggles();
 
       const userById = new Map(users.map((u) => [u.user_id, u]));
-      sl.teams.clear(); sl.ownerOf.clear(); sl.myTeam = null; sl.partner = null;
+      sl.teams.clear(); sl.ownerOf.clear(); sl.info.clear(); sl.myTeam = null; sl.partner = null;
+      finder.need = null; finder.results = null; sl.analysis = null;
+      const ptsIdx = rec === 1 ? 1 : rec === 0.5 ? 0 : 2; // stats tuple: [half, ppr, std, gp]
       for (const r of rosterList) {
         const u = userById.get(r.owner_id);
         const name = u ? (u.metadata?.team_name || u.display_name) : `Team ${r.roster_id}`;
+        const reserve = new Set(r.reserve || []);
         const list = (r.players || []).filter((pid) => pmap[pid]).map((pid) => {
-          const [pname, pos] = pmap[pid];
-          return { name: pname, pos, id: matchValue(pname, pos) };
+          const [pname, pos, inj] = pmap[pid];
+          const st = stats[pid];
+          const ppg = st && st[3] > 0 ? st[ptsIdx] / st[3] : 0;
+          const out = reserve.has(pid) || OUT_STATUSES.has(inj);
+          return { pid, name: pname, pos, id: matchValue(pname, pos), inj: reserve.has(pid) && !inj ? 'IR' : inj, out, ppg };
         });
-        sl.teams.set(r.roster_id, { name, players: list });
-        for (const p of list) if (p.id) sl.ownerOf.set(p.id, r.roster_id);
+        const st = r.settings || {};
+        sl.teams.set(r.roster_id, { rid: r.roster_id, name, players: list, wins: st.wins || 0, losses: st.losses || 0, ties: st.ties || 0 });
+        for (const p of list) if (p.id) { sl.ownerOf.set(p.id, r.roster_id); sl.info.set(p.id, p); }
         if (r.owner_id === sl.user.user_id || (r.co_owners || []).includes(sl.user.user_id)) sl.myTeam = r.roster_id;
       }
       if (sl.myTeam == null) throw new Error("Couldn't find your team in that league.");
@@ -610,6 +662,7 @@
       slStatus(`Loaded ${sl.teams.size} teams. Search "You get" to find any player in the league — picking one sets the trade partner.${unmatched ? ` (${unmatched} of your players aren't on Boone's chart.)` : ''}`);
       render();
       refreshSearches();
+      renderFinder();
     } catch (e) { slStatus(e.message, true); }
   }
 
@@ -626,6 +679,323 @@
   }
 
   $('#sl-opp').addEventListener('change', (e) => setPartner(e.target.value ? Number(e.target.value) : null));
+
+  // ---------- injuries & season stats ----------
+  // Statuses that keep a player out of the lineup (Questionable still plays).
+  const OUT_STATUSES = new Set(['IR', 'Out', 'PUP', 'Sus', 'Doubtful', 'NA', 'COV', 'DNR']);
+  const INJ_ABBR = { Questionable: 'Q', Doubtful: 'D', Out: 'OUT', IR: 'IR', PUP: 'PUP', Sus: 'SUS', NA: 'NA', COV: 'COV', DNR: 'DNR' };
+  function injBadge(id) {
+    const i = sl.info.get(id);
+    if (!i || !i.inj) return '';
+    return `<span class="inj${i.out ? '' : ' q'}" title="${esc(i.inj)}">${esc(INJ_ABBR[i.inj] || i.inj)}</span>`;
+  }
+
+  // Season-to-date totals keyed by Sleeper id -> [half, ppr, std, games played].
+  async function sleeperStats(season, pmap) {
+    const key = `btc.slStats.${season}`;
+    const cached = store.get(key, null);
+    if (cached && Date.now() - cached.at < 6 * 3600e3) return cached.map;
+    slStatus('Downloading season stats…');
+    try {
+      const all = await getJson(`${SL}/stats/nfl/regular/${season}`);
+      const map = {};
+      for (const [id, s] of Object.entries(all)) {
+        if (!pmap[id] || !s || !s.gp) continue;
+        map[id] = [s.pts_half_ppr || 0, s.pts_ppr || 0, s.pts_std || 0, s.gp];
+      }
+      store.set(key, { at: Date.now(), map });
+      return map;
+    } catch {
+      return {}; // trade finder degrades to zero PPG; value tools still work
+    }
+  }
+
+  // ---------- team analysis (YTD points per game) ----------
+  const POS4 = ['QB', 'RB', 'WR', 'TE'];
+  const FLEX_ELIG = { FLEX: ['RB', 'WR', 'TE'], WRRB_FLEX: ['RB', 'WR'], REC_FLEX: ['WR', 'TE'], SUPER_FLEX: ['QB'] };
+
+  // Lineup weights per position: 1 per dedicated slot, a share of each flex slot.
+  function slotWeights(rosterPositions) {
+    const w = { QB: [], RB: [], WR: [], TE: [] };
+    for (const s of rosterPositions || []) {
+      if (w[s]) w[s].push(1);
+      else if (FLEX_ELIG[s]) for (const p of FLEX_ELIG[s]) w[p].push(1 / FLEX_ELIG[s].length);
+    }
+    for (const p of POS4) w[p].sort((a, b) => b - a);
+    return w;
+  }
+
+  // Weighted PPG of a team's best healthy players at one position.
+  function strength(list, pos, W) {
+    const ppgs = list.filter((p) => p.pos === pos && !p.out).map((p) => p.ppg).sort((a, b) => b - a);
+    return W[pos].reduce((s, w, i) => s + w * (ppgs[i] || 0), 0);
+  }
+
+  function analyze() {
+    if (sl.analysis) return sl.analysis;
+    const W = slotWeights(sl.league?.roster_positions);
+    const str = new Map();
+    for (const [rid, t] of sl.teams) str.set(rid, Object.fromEntries(POS4.map((p) => [p, strength(t.players, p, W)])));
+    const median = {};
+    for (const p of POS4) {
+      const xs = [...str.values()].map((s) => s[p]).sort((a, b) => a - b);
+      median[p] = xs.length ? (xs[(xs.length - 1) >> 1] + xs[xs.length >> 1]) / 2 : 0;
+    }
+    const ratio = (rid, p, s = str.get(rid)[p]) => (median[p] > 0 ? s / median[p] : 1);
+    const positions = POS4.filter((p) => W[p].length);
+    const mine = positions.map((p) => ({ pos: p, r: ratio(sl.myTeam, p) })).sort((a, b) => a.r - b.r);
+    return (sl.analysis = { W, str, ratio, positions, mine, autoNeed: mine[0]?.pos });
+  }
+
+  const finder = { need: null, results: null };
+  const myNeed = () => (sl.myTeam == null ? null : finder.need || analyze().autoNeed);
+  const winPct = (t) => { const g = t.wins + t.losses + t.ties; return g ? (t.wins + t.ties / 2) / g : 0.5; };
+  const recStr = (t) => `${t.wins}-${t.losses}${t.ties ? `-${t.ties}` : ''}`;
+  const pct = (r) => `${Math.round(r * 100)}%`;
+
+  // ---------- package builder ----------
+  // In uneven deals the side sending more players owes a premium: each extra
+  // player raises the required total by this much (see consolidation note).
+  const CONSOLIDATION = 0.05;
+
+  // Combos of 1..maxN players from `pool` whose total lands in [lo, hi].
+  // Lower score = better (closer to center, fewer players, smaller penalty).
+  function buildPackages(pool, { lo, hi, center, maxN = 3, limit = 5, baseCount = 1, penalty = () => 0 }) {
+    const cands = pool.filter((p) => p.v > 0 && p.v <= hi * 1.4).sort((a, b) => b.v - a.v).slice(0, 24);
+    const out = [];
+    const walk = (start, picked, sum) => {
+      if (picked.length) {
+        const k = 1 + CONSOLIDATION * Math.max(0, picked.length - baseCount);
+        if (sum >= lo * k && sum <= hi * k) {
+          const score = Math.abs(sum / (center * k) - 1) + 0.12 * (picked.length - 1) +
+            picked.reduce((s, p) => s + penalty(p), 0);
+          out.push({ players: [...picked], sum, score });
+        }
+      }
+      if (picked.length >= maxN) return;
+      for (let i = start; i < cands.length; i++) {
+        picked.push(cands[i]);
+        walk(i + 1, picked, sum + cands[i].v);
+        picked.pop();
+      }
+    };
+    walk(0, [], 0);
+    out.sort((a, b) => a.score - b.score);
+    // Variety: don't let one player anchor every suggestion.
+    const res = [], used = new Map();
+    for (const o of out) {
+      const anchor = o.players[0].id;
+      if ((used.get(anchor) || 0) >= 2) continue;
+      used.set(anchor, (used.get(anchor) || 0) + 1);
+      res.push(o);
+      if (res.length >= limit) break;
+    }
+    return res;
+  }
+
+  // Build from players outside your need position first; fall back to everyone.
+  function sparingNeed(pool, opts, avoidPos) {
+    const pkgs = avoidPos ? buildPackages(pool.filter((p) => p.pos !== avoidPos), opts) : [];
+    return pkgs.length ? pkgs : buildPackages(pool, opts);
+  }
+
+  const valued = (p) => ({ ...p, v: valueOf(byId.get(p.id)) });
+  const teamPool = (rid, exclude) =>
+    sl.teams.get(rid).players.filter((p) => p.id && !exclude.has(p.id)).map(valued).filter((p) => p.v > 0);
+  const chartPool = (exclude) =>
+    players.filter((p) => !exclude.has(idOf(p))).map((p) => ({ id: idOf(p), name: p.name, pos: p.pos, v: valueOf(p) }));
+  const asPlayers = (ids) => ids.map((id) => ({ id, name: byId.get(id).name, pos: byId.get(id).pos, v: valueOf(byId.get(id)) }));
+
+  const who = (ps) => ps.map((p) => esc(p.name) + injBadge(p.id)).join(' + ');
+  const line = (lbl, ps, sum) =>
+    `<div class="line"><span class="lbl">${lbl}</span><span class="who">${who(ps)}</span><span class="sum">${sum}</span></div>`;
+
+  // ---------- suggestion tools ----------
+  const OFFERS = {
+    fair: { title: 'Fair offers', lo: 0.95, hi: 1.07, center: 1.0 },
+    over: { title: 'Aggressive offers (overpay to get it done)', lo: 1.1, hi: 1.3, center: 1.18 },
+    low: { title: 'Lowball offers (worth a try)', lo: 0.72, hi: 0.9, center: 0.82 },
+  };
+  let toolSig = null;    // trade the current suggestions were built for
+  let toolItems = [];    // [{ side, ids, replace }]
+  const tradeSig = () => `${state.get.join(',')}|${state.give.join(',')}`;
+  const hint = (msg) => { $('#tool-out').innerHTML = `<div class="hint">${msg}</div>`; toolSig = tradeSig(); };
+
+  function runTool(kind) {
+    toolItems = [];
+    if (kind === 'even') return evenOut();
+    const cfg = OFFERS[kind];
+    if (sl.myTeam == null) return hint('Load your Sleeper league (below) so offers can be built from your roster.');
+    if (!state.get.length) return hint('Add the player(s) you want to “You get” first.');
+    const target = total('get');
+    const need = myNeed();
+    const pkgs = sparingNeed(teamPool(sl.myTeam, new Set(state.get)), {
+      lo: target * cfg.lo, hi: target * cfg.hi, center: target * cfg.center, baseCount: state.get.length,
+    }, need);
+    if (!pkgs.length) return hint('No combination of up to 3 of your players lands in that range.');
+    const getPs = asPlayers(state.get);
+    $('#tool-out').innerHTML = `<div class="hint">${cfg.title} for ${who(getPs)} (${target}).` +
+      `${need ? ` Avoids sending ${esc(need)} where possible.` : ''}</div><ul class="sugs">` +
+      pkgs.map((pk, i) => {
+        toolItems.push({ side: 'give', ids: pk.players.map((p) => p.id), replace: true });
+        const d = Math.round((pk.sum / target - 1) * 100);
+        return `<li class="sug">${line('Give', pk.players, pk.sum)}${line('Get', getPs, target)}
+          <div class="act"><span class="hint" style="margin:0 auto 0 0">${d >= 0 ? '+' : ''}${d}% vs. their side</span>
+          <button class="btn primary" data-use="${i}">Use</button></div></li>`;
+      }).join('') + '</ul>';
+    toolSig = tradeSig();
+  }
+
+  function evenOut() {
+    const g = total('get'), v = total('give');
+    if (!state.get.length && !state.give.length) return hint('Add some players to the trade first.');
+    const diff = g - v;
+    const tol = Math.max(3, 0.08 * Math.max(g, v));
+    if (Math.abs(diff) <= tol) return hint(`Already in the fair range (within ±${Math.round(tol)}).`);
+    const side = diff > 0 ? 'give' : 'get';
+    const exclude = new Set([...state.get, ...state.give]);
+    let pool;
+    if (sl.myTeam == null) pool = chartPool(exclude);
+    else if (side === 'give') pool = teamPool(sl.myTeam, exclude);
+    else if (sl.partner != null) pool = teamPool(sl.partner, exclude);
+    else return hint('Pick a trade partner first so I know whose roster to pull from.');
+    const gap = Math.abs(diff);
+    const pkgs = sparingNeed(pool, {
+      lo: Math.max(1, gap - tol), hi: gap + tol, center: gap, maxN: 2, limit: 6, baseCount: 99,
+    }, side === 'give' ? myNeed() : null);
+    if (!pkgs.length) return hint('Nobody available closes that gap cleanly.');
+    $('#tool-out').innerHTML = `<div class="hint">${diff > 0 ? `You're getting ${gap} more. Add to “You give”:` : `You're giving ${gap} more. Ask for:`}</div><ul class="sugs">` +
+      pkgs.map((pk, i) => {
+        toolItems.push({ side, ids: pk.players.map((p) => p.id), replace: false });
+        return `<li class="sug">${line('Add', pk.players, pk.sum)}
+          <div class="act"><button class="btn primary" data-use="${i}">Add</button></div></li>`;
+      }).join('') + '</ul>';
+    toolSig = tradeSig();
+  }
+
+  // Suggestions go stale as soon as the trade changes.
+  function renderTools() {
+    if (toolSig !== null && toolSig !== tradeSig()) { $('#tool-out').innerHTML = ''; toolSig = null; }
+  }
+
+  $('#tools').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tool]');
+    if (t) return runTool(t.dataset.tool);
+    const u = e.target.closest('[data-use]');
+    if (!u) return;
+    const item = toolItems[Number(u.dataset.use)];
+    if (item.replace) state[item.side] = item.ids;
+    else state[item.side].push(...item.ids);
+    render();
+  });
+
+  // ---------- trade finder ----------
+  function findTrades(needPos) {
+    const A = analyze();
+    const { W, ratio } = A;
+    const me = sl.teams.get(sl.myTeam);
+    const myStr = A.str.get(sl.myTeam);
+    const myPool = me.players.filter((p) => p.id && p.pos !== needPos).map((p) => {
+      const loss = myStr[p.pos] - strength(me.players.filter((x) => x !== p), p.pos, W);
+      return { ...valued(p), loss };
+    }).filter((p) => p.v > 0);
+
+    const ideas = [];
+    for (const [rid, t] of sl.teams) {
+      if (rid === sl.myTeam) continue;
+      const wp = winPct(t);
+      const seller = wp < 0.45, contender = wp >= 0.6;
+      for (const g of t.players) {
+        if (!g.id || g.pos !== needPos || g.out) continue;
+        const gv = valueOf(byId.get(g.id));
+        if (gv <= 0) continue;
+        const myGain = strength([...me.players, g], needPos, W) - myStr[needPos];
+        if (myGain < 0.5) continue; // wouldn't crack your lineup
+        const theirAfter = ratio(rid, needPos, strength(t.players.filter((x) => x !== g), needPos, W));
+        const pkgs = buildPackages(myPool, {
+          lo: gv * 0.92, hi: gv * 1.1, center: gv * 1.0, maxN: 2, limit: 3, baseCount: 1,
+          penalty: (p) => {
+            let pen = p.loss / 15;                                     // hurts your lineup
+            if (p.out) pen += contender ? -0.15 : seller ? 0.5 : 0.15; // injured: contenders can wait
+            pen -= Math.max(0, 1 - ratio(rid, p.pos)) * 0.5;            // they need this position
+            return pen;
+          },
+        });
+        for (const pk of pkgs) {
+          const injured = pk.players.filter((p) => p.out);
+          if (seller && injured.length) continue; // rebuilding teams won't wait on injuries
+          const givePos = pk.players[0].pos;
+          const theirNeed = ratio(rid, givePos);
+          let score = 1.2 - pk.score + Math.min(myGain, 10) / 10 + (Math.min(theirAfter, 1.3) - 0.9) + Math.max(0, 1 - theirNeed);
+          if (seller) score += 0.25;
+          if (contender && injured.length) score += 0.2;
+
+          const why = [`Adds ~${myGain.toFixed(1)} PPG to your ${needPos} starters (${esc(g.name)}: ${g.ppg.toFixed(1)} PPG YTD)`];
+          why.push(theirAfter >= 0.9
+            ? `Deep at ${needPos}: still ${pct(theirAfter)} of league median without ${esc(g.name)}`
+            : `Leaves them thinner at ${needPos} (${pct(theirAfter)} of median), so expect pushback`);
+          if (theirNeed < 0.95) why.push(`They're thin at ${givePos} (${pct(theirNeed)} of median), so your ${givePos} fills a hole`);
+          if (seller) why.push(`${recStr(t)} record: losing teams are usually more open to deals`);
+          if (contender && injured.length) why.push(`${recStr(t)} contender can afford to wait on ${injured.map((p) => `${esc(p.name)} (${esc(p.inj)})`).join(', ')}`);
+          ideas.push({ rid, team: t, get: { ...g, v: gv }, pkg: pk, score, why });
+        }
+      }
+    }
+    ideas.sort((a, b) => b.score - a.score);
+    // At most 2 ideas per team, and no one of your players in more than 3.
+    const perTeam = new Map(), perGive = new Map(), seen = new Set(), res = [];
+    for (const idea of ideas) {
+      const ids = idea.pkg.players.map((p) => p.id);
+      const sig = idea.get.id + '|' + ids.join(',');
+      if (seen.has(sig) || (perTeam.get(idea.rid) || 0) >= 2 || ids.some((id) => (perGive.get(id) || 0) >= 3)) continue;
+      seen.add(sig);
+      perTeam.set(idea.rid, (perTeam.get(idea.rid) || 0) + 1);
+      for (const id of ids) perGive.set(id, (perGive.get(id) || 0) + 1);
+      res.push(idea);
+      if (res.length >= 10) break;
+    }
+    return res;
+  }
+
+  function renderFinder() {
+    const body = $('#finder-body');
+    if (sl.myTeam == null) { body.innerHTML = '<div class="hint">Load your Sleeper league to find trades.</div>'; return; }
+    const A = analyze();
+    const need = myNeed();
+    const chips = A.mine.slice().sort((a, b) => POS4.indexOf(a.pos) - POS4.indexOf(b.pos)).map(({ pos, r }) =>
+      `<button class="chip" data-need="${pos}" aria-pressed="${pos === need}">${pos}<span class="pct ${r < 0.95 ? 'lo' : r > 1.05 ? 'hi' : ''}">${pct(r)}</span></button>`
+    ).join('');
+    let html = `<div class="hint">Your healthy starters' YTD points per game vs. the league median. ` +
+      `Your weakest spot is pre-selected; tap another position to target it.</div><div class="chips">${chips}</div>` +
+      `<div class="tools" style="grid-template-columns:1fr"><button class="btn primary" data-find>Find ${esc(need)} trades</button></div>`;
+    if (finder.results) {
+      html += finder.results.length ? '<ul class="sugs">' + finder.results.map((idea, i) => `
+        <li class="sug">
+          <div class="head"><span>${esc(idea.team.name)}</span><span class="rec">${recStr(idea.team)}</span></div>
+          ${line('Give', idea.pkg.players, idea.pkg.sum)}
+          ${line('Get', [idea.get], idea.get.v)}
+          <ul class="why">${idea.why.map((w) => `<li>${w}</li>`).join('')}</ul>
+          <div class="act"><button class="btn primary" data-load="${i}">Load trade</button></div>
+        </li>`).join('') + '</ul>'
+        : `<div class="hint">No good ${esc(need)} matches. Try another position.</div>`;
+    }
+    body.innerHTML = html;
+  }
+
+  $('#finder-body').addEventListener('click', (e) => {
+    const n = e.target.closest('[data-need]');
+    if (n) { finder.need = n.dataset.need; finder.results = null; return renderFinder(); }
+    if (e.target.closest('[data-find]')) { finder.results = findTrades(myNeed()); return renderFinder(); }
+    const l = e.target.closest('[data-load]');
+    if (l) {
+      const idea = finder.results[Number(l.dataset.load)];
+      setPartner(idea.rid);
+      state.get = [idea.get.id];
+      state.give = idea.pkg.players.map((p) => p.id);
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
 
   // ---------- init ----------
   syncToggles();
