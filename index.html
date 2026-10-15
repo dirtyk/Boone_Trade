@@ -540,7 +540,8 @@
 
   $('#sl-league').addEventListener('change', (e) => e.target.value && loadLeague(e.target.value));
 
-  $('#sl-load').addEventListener('click', async () => {
+  $('#sl-load').addEventListener('click', () => loadUser());
+  async function loadUser() {
     const username = $('#sl-user').value.trim();
     if (!username) return slStatus('Enter a Sleeper username.', true);
     try {
@@ -557,11 +558,12 @@
         sl.leagues.map((l) => `<option value="${esc(l.league_id)}">${esc(l.name)}</option>`).join('');
       $('#sl-league-wrap').hidden = false;
       store.set('btc.slUser', username);
-      const last = store.get('btc.slLeague', '');
+      const saved = store.get('btc.slLeague', '');
+      const last = sl.leagues.length === 1 ? sl.leagues[0].league_id : saved;
       if (last && sl.leagues.some((l) => l.league_id === last)) { sel.value = last; await loadLeague(last); }
       else slStatus(`Found ${sl.leagues.length} league${sl.leagues.length === 1 ? '' : 's'}.`);
     } catch (e) { slStatus(e.message, true); }
-  });
+  }
 
   $('#sl-league').addEventListener('change', (e) => e.target.value && loadLeague(e.target.value));
 
@@ -627,9 +629,13 @@
 
   // ---------- init ----------
   syncToggles();
-  const savedUser = store.get('btc.slUser', '');
-  if (savedUser) $('#sl-user').value = savedUser;
-  loadValues();
+  const DEFAULT_SLEEPER_USER = 'kkholiday';
+  $('#sl-user').value = store.get('btc.slUser', '') || DEFAULT_SLEEPER_USER;
+  // Auto-load the Sleeper user once values are in (roster matching needs them).
+  // If no league was remembered, open the panel so the league can be picked.
+  loadValues().then(loadUser).then(() => {
+    if (!$('#sl-league').value) $('#sleeper').open = true;
+  });
 })();
 </script>
 </body>
