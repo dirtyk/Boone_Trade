@@ -35,5 +35,6 @@ node scripts/update-values.js "https://sports.yahoo.com/fantasy/article/2026-tra
 - "You get" / "You give" sides with type-ahead search; tap to add or remove
 - Live totals, point difference and color-coded verdict (fair = within 3 points or 8%)
 - Consolidation note for uneven deals (2-for-1, 3-for-1, …)
-- Sleeper import: username → league → trade partner, then tap players from either roster
+- Sleeper import: once a league is loaded, "You get" suggests any player in the league (picking one
+  sets the trade partner) and "You give" suggests only your roster; full rosters still expand/collapse
 - Trade is saved in the URL hash, so you can share a link to a specific trade

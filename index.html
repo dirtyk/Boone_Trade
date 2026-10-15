@@ -78,6 +78,7 @@
   .row:last-child { border-bottom: 0; }
   .row:active { background: rgba(255,255,255,.05); }
   .row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .name small { display: block; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
   .row .val { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
   .row .x { color: var(--muted); font-size: 20px; line-height: 1; width: 20px; text-align: center; }
   .row[disabled] { opacity: .4; cursor: default; }
@@ -315,21 +316,31 @@
   }
 
   // ---------- search ----------
-  function playerRow(p, { side, removable } = {}) {
+  function playerRow(p, { side, removable, showOwner } = {}) {
     const on = side && sideOf(idOf(p)) === side;
+    const team = showOwner && teamOf(idOf(p));
     return `<li><button class="row${on ? ' on' : ''}" data-id="${esc(idOf(p))}">
       <span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>
-      <span class="name">${esc(p.name)}</span>
+      <span class="name">${esc(p.name)}${team ? `<small>${esc(team.name)}</small>` : ''}</span>
       <span class="val">${valueOf(p)}</span>
       ${removable ? '<span class="x" aria-label="Remove">×</span>' : ''}
     </button></li>`;
   }
 
-  function search(q) {
+  // With a Sleeper league loaded, "You give" only suggests your roster and
+  // "You get" suggests players on every other team in the league.
+  function inScope(p, side) {
+    if (!sl.myTeam) return true;
+    const team = sl.ownerOf.get(idOf(p));
+    return side === 'give' ? team === sl.myTeam : team != null && team !== sl.myTeam;
+  }
+
+  function search(q, side) {
     const nq = normalizeKey(q);
     if (!nq) return [];
     const starts = [], contains = [];
     for (const p of players) {
+      if (!inScope(p, side)) continue;
       if (p.key.startsWith(nq) || p.key.split(' ').some((w) => w.startsWith(nq))) starts.push(p);
       else if (p.key.includes(nq)) contains.push(p);
     }
@@ -339,9 +350,20 @@
 
   function refreshSearches() {
     $$('section[data-side]').forEach((sec) => {
+      const side = sec.dataset.side;
       const input = $('input', sec);
-      $('.results', sec).innerHTML = search(input.value).map((p) => playerRow(p, { side: sec.dataset.side })).join('');
+      const hits = search(input.value, side);
+      $('.results', sec).innerHTML = hits.length || !input.value.trim()
+        ? hits.map((p) => playerRow(p, { side, showOwner: side === 'get' })).join('')
+        : `<li class="empty" style="padding:12px">No ${sl.myTeam ? (side === 'give' ? 'players on your roster' : 'rostered players') : 'players'} match.</li>`;
     });
+  }
+
+  // Picking a player owned by another team makes that team the trade partner.
+  function pick(side, id) {
+    const team = side === 'get' && sideOf(id) !== 'get' && sl.ownerOf.get(id);
+    if (team && team !== sl.partner) setPartner(team);
+    toggle(side, id);
   }
 
   $$('section[data-side]').forEach((sec) => {
@@ -355,7 +377,7 @@
     });
     results.addEventListener('click', (e) => {
       const btn = e.target.closest('.row'); if (!btn) return;
-      toggle(side, btn.dataset.id);
+      pick(side, btn.dataset.id);
       input.value = '';
       refreshSearches();
       input.focus();
@@ -382,7 +404,7 @@
       const list = state[side].map((id) => byId.get(id)).filter(Boolean)
         .sort((a, b) => valueOf(b) - valueOf(a));
       $('.picked', sec).innerHTML = list.length
-        ? list.map((p) => playerRow(p, { removable: true })).join('')
+        ? list.map((p) => playerRow(p, { removable: true, showOwner: side === 'get' })).join('')
         : `<li class="empty">${side === 'get' ? 'Players you receive' : 'Players you send away'} — search or pick from a roster.</li>`;
       $(`#total-${side}`).textContent = total(side);
       renderRoster(side);
@@ -444,8 +466,8 @@
     const roster = rosters[side];
     if (!roster) { slot.innerHTML = ''; return; }
     const open = sec.dataset.rosterOpen === '1';
-    const label = side === 'get' ? 'their roster' : 'my roster';
-    let html = `<button class="roster-toggle">${open ? 'Hide' : 'Pick from'} ${label} (${roster.length})</button>`;
+    const label = side === 'get' && sl.partner != null ? `${sl.teams.get(sl.partner).name.replace(/s$/i, '$&’').replace(/[^’]$/, '$&’s')} roster` : 'my roster';
+    let html = `<button class="roster-toggle">${open ? 'Hide' : 'Pick from'} ${esc(label)} (${roster.length})</button>`;
     if (open) {
       const items = roster.map((r) => {
         const p = r.id && byId.get(r.id);
@@ -485,7 +507,14 @@
     if (!res.ok) throw new Error(`Sleeper returned HTTP ${res.status}`);
     return res.json();
   };
-  const sl = { user: null, leagues: [], rosters: [], users: [], playerMap: null };
+  const sl = {
+    user: null, leagues: [], playerMap: null,
+    teams: new Map(),    // roster_id -> { name, players: [{ name, pos, id|null }] }
+    ownerOf: new Map(),  // value id -> roster_id
+    myTeam: null,        // your roster_id
+    partner: null,       // trade partner's roster_id
+  };
+  const teamOf = (id) => sl.teams.get(sl.ownerOf.get(id));
 
   // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE map for a day.
   async function sleeperPlayers() {
@@ -509,14 +538,7 @@
     return p ? idOf(p) : null;
   }
 
-  function rosterFor(ownerId, pmap) {
-    const r = sl.rosters.find((x) => x.owner_id === ownerId || (x.co_owners || []).includes(ownerId));
-    if (!r) return [];
-    return (r.players || []).filter((pid) => pmap[pid]).map((pid) => {
-      const [name, pos] = pmap[pid];
-      return { name, pos, id: matchValue(name, pos) };
-    });
-  }
+  $('#sl-league').addEventListener('change', (e) => e.target.value && loadLeague(e.target.value));
 
   $('#sl-load').addEventListener('click', async () => {
     const username = $('#sl-user').value.trim();
@@ -548,7 +570,7 @@
       slStatus('Loading rosters…');
       store.set('btc.slLeague', leagueId);
       const league = sl.leagues.find((l) => l.league_id === leagueId);
-      [sl.rosters, sl.users] = await Promise.all([
+      const [rosterList, users] = await Promise.all([
         getJson(`${SL}/league/${leagueId}/rosters`),
         getJson(`${SL}/league/${leagueId}/users`),
       ]);
@@ -560,28 +582,48 @@
       if (league?.roster_positions) settings.qb = league.roster_positions.includes('SUPER_FLEX') ? 'sf' : '1qb';
       store.set('btc.settings', settings); syncToggles();
 
-      rosters.give = rosterFor(sl.user.user_id, pmap);
+      const userById = new Map(users.map((u) => [u.user_id, u]));
+      sl.teams.clear(); sl.ownerOf.clear(); sl.myTeam = null; sl.partner = null;
+      for (const r of rosterList) {
+        const u = userById.get(r.owner_id);
+        const name = u ? (u.metadata?.team_name || u.display_name) : `Team ${r.roster_id}`;
+        const list = (r.players || []).filter((pid) => pmap[pid]).map((pid) => {
+          const [pname, pos] = pmap[pid];
+          return { name: pname, pos, id: matchValue(pname, pos) };
+        });
+        sl.teams.set(r.roster_id, { name, players: list });
+        for (const p of list) if (p.id) sl.ownerOf.set(p.id, r.roster_id);
+        if (r.owner_id === sl.user.user_id || (r.co_owners || []).includes(sl.user.user_id)) sl.myTeam = r.roster_id;
+      }
+      if (sl.myTeam == null) throw new Error("Couldn't find your team in that league.");
+
       const opp = $('#sl-opp');
-      const others = sl.users.filter((u) => u.user_id !== sl.user.user_id);
-      opp.innerHTML = '<option value="">Choose a team…</option>' + others.map((u) =>
-        `<option value="${esc(u.user_id)}">${esc(u.metadata?.team_name || u.display_name)}${u.metadata?.team_name ? ` (${esc(u.display_name)})` : ''}</option>`
-      ).join('');
+      opp.innerHTML = '<option value="">Choose a team…</option>' + [...sl.teams]
+        .filter(([rid]) => rid !== sl.myTeam)
+        .map(([rid, t]) => `<option value="${rid}">${esc(t.name)}</option>`).join('');
       $('#sl-opp-wrap').hidden = false;
+      rosters.give = sl.teams.get(sl.myTeam).players;
       rosters.get = null;
-      $('section[data-side="give"]').dataset.rosterOpen = '1';
       const unmatched = rosters.give.filter((r) => !r.id).length;
-      slStatus(`Loaded your roster (${rosters.give.length} players${unmatched ? `, ${unmatched} not on Boone's chart` : ''}). Pick a trade partner.`);
+      slStatus(`Loaded ${sl.teams.size} teams. Search "You get" to find any player in the league — picking one sets the trade partner.${unmatched ? ` (${unmatched} of your players aren't on Boone's chart.)` : ''}`);
       render();
+      refreshSearches();
     } catch (e) { slStatus(e.message, true); }
   }
 
-  $('#sl-opp').addEventListener('change', (e) => {
-    if (!e.target.value || !sl.playerMap) return;
-    rosters.get = rosterFor(e.target.value, sl.playerMap);
-    $('section[data-side="get"]').dataset.rosterOpen = '1';
-    slStatus('Tap players on either roster to add them to the trade.');
+  // Switching partners drops "You get" players that belong to a different team.
+  function setPartner(rid) {
+    sl.partner = rid;
+    $('#sl-opp').value = rid == null ? '' : String(rid);
+    rosters.get = rid == null ? null : sl.teams.get(rid).players;
+    const before = state.get.length;
+    state.get = state.get.filter((id) => { const t = sl.ownerOf.get(id); return t == null || t === rid; });
+    const dropped = before - state.get.length;
+    if (rid != null) slStatus(`Trading with ${sl.teams.get(rid).name}.${dropped ? ` Removed ${dropped} player${dropped === 1 ? '' : 's'} from another team.` : ''}`);
     render();
-  });
+  }
+
+  $('#sl-opp').addEventListener('change', (e) => setPartner(e.target.value ? Number(e.target.value) : null));
 
   // ---------- init ----------
   syncToggles();
