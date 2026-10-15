@@ -170,6 +170,26 @@
   .chip[aria-pressed="true"] { border-color: var(--accent); background: rgba(76,154,255,.18); }
   .chip .pct { font-variant-numeric: tabular-nums; margin-left: 4px; }
   .chip .pct.lo { color: var(--lose); } .chip .pct.hi { color: var(--win); }
+  .accept { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .accept .big { font-size: 20px; font-weight: 800; }
+  .accept.win .big { color: var(--win); } .accept.fair .big { color: var(--fair); } .accept.lose .big { color: var(--lose); }
+  .meter { display: flex; gap: 4px; flex: none; }
+  .meter i { width: 14px; height: 14px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--border); }
+  .accept.win .meter i.on { background: var(--win); border-color: var(--win); }
+  .accept.fair .meter i.on { background: var(--fair); border-color: var(--fair); }
+  .accept.lose .meter i.on { background: var(--lose); border-color: var(--lose); }
+  table.impact { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  table.impact th, table.impact td { padding: 7px 4px; border-bottom: 1px solid var(--border); text-align: left; }
+  table.impact thead th { color: var(--muted); font-size: 12px; font-weight: 700; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  table.impact tbody th { color: var(--muted); width: 44px; }
+  table.impact td.up b, table.impact td.up { color: var(--win); }
+  table.impact td.down b, table.impact td.down { color: var(--lose); }
+  table.impact tr.tot td { font-weight: 800; font-size: 15px; }
+  #analysis h3 { font-size: 14px; margin: 14px 0 0; }
+  .tag { font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 999px; white-space: nowrap; align-self: flex-start; }
+  .tag.win { background: rgba(47,191,113,.15); color: var(--win); }
+  .tag.fair { background: rgba(227,179,65,.15); color: var(--fair); }
+  .tag.lose { background: rgba(240,86,74,.15); color: var(--lose); }
   footer { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0 20px; }
   footer a { color: var(--muted); }
 </style>
@@ -216,6 +236,11 @@
     <div class="big" id="verdict-big"></div>
     <div class="sub" id="verdict-sub"></div>
     <div class="note" id="consolidation" hidden></div>
+  </section>
+
+  <section class="card" id="analysis" hidden>
+    <div class="side-head"><h2>Trade analysis</h2></div>
+    <div id="analysis-body"></div>
   </section>
 
   <section class="card" id="tools">
@@ -452,6 +477,7 @@
     }
     renderVerdict();
     renderTools();
+    renderAnalysis();
     writeHash();
   }
 
@@ -924,20 +950,23 @@
         for (const pk of pkgs) {
           const injured = pk.players.filter((p) => p.out);
           if (seller && injured.length) continue; // rebuilding teams won't wait on injuries
+          const ev = evalTrade(rid, [g.id], pk.players.map((p) => p.id));
+          if (ev.odds < 0.2) continue;    // they'd almost certainly say no
+          if (ev.mePpg < 0) continue;     // must not make your lineup worse overall
           const givePos = pk.players[0].pos;
           const theirNeed = ratio(rid, givePos);
-          let score = 1.2 - pk.score + Math.min(myGain, 10) / 10 + (Math.min(theirAfter, 1.3) - 0.9) + Math.max(0, 1 - theirNeed);
-          if (seller) score += 0.25;
-          if (contender && injured.length) score += 0.2;
+          const theirPosGain = ratio(rid, givePos, ev.themAfter[givePos]) - theirNeed;
+          let score = 1.2 - pk.score + Math.min(ev.mePpg, 8) / 8 + 1.5 * ev.odds;
 
-          const why = [`Adds ~${myGain.toFixed(1)} PPG to your ${needPos} starters (${esc(g.name)}: ${g.ppg.toFixed(1)} PPG YTD)`];
+          const why = [`Your lineup: ${fmt(ev.mePpg)} PPG per week (${esc(g.name)}: ${g.ppg.toFixed(1)} PPG YTD)`];
           why.push(theirAfter >= 0.9
             ? `Deep at ${needPos}: still ${pct(theirAfter)} of league median without ${esc(g.name)}`
             : `Leaves them thinner at ${needPos} (${pct(theirAfter)} of median), so expect pushback`);
-          if (theirNeed < 0.95) why.push(`They're thin at ${givePos} (${pct(theirNeed)} of median), so your ${givePos} fills a hole`);
+          if (theirNeed < 0.95 && theirPosGain >= 0.05) why.push(`They're thin at ${givePos}: ${pct(theirNeed)} → ${pct(theirNeed + theirPosGain)} of median with your ${givePos}`);
+          why.push(`Their lineup: ${fmt(ev.themPpg)} PPG per week`);
           if (seller) why.push(`${recStr(t)} record: losing teams are usually more open to deals`);
           if (contender && injured.length) why.push(`${recStr(t)} contender can afford to wait on ${injured.map((p) => `${esc(p.name)} (${esc(p.inj)})`).join(', ')}`);
-          ideas.push({ rid, team: t, get: { ...g, v: gv }, pkg: pk, score, why });
+          ideas.push({ rid, team: t, get: { ...g, v: gv }, pkg: pk, score, why, verdict: ev.verdict });
         }
       }
     }
@@ -971,7 +1000,7 @@
     if (finder.results) {
       html += finder.results.length ? '<ul class="sugs">' + finder.results.map((idea, i) => `
         <li class="sug">
-          <div class="head"><span>${esc(idea.team.name)}</span><span class="rec">${recStr(idea.team)}</span></div>
+          <div class="head"><span>${esc(idea.team.name)} <span class="rec">${recStr(idea.team)}</span></span><span class="tag ${idea.verdict[1]}">${idea.verdict[0].replace(/ to accept$/, '')}</span></div>
           ${line('Give', idea.pkg.players, idea.pkg.sum)}
           ${line('Get', [idea.get], idea.get.v)}
           <ul class="why">${idea.why.map((w) => `<li>${w}</li>`).join('')}</ul>
@@ -996,6 +1025,150 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
+
+  // ---------- trade analysis (rosters after the trade) ----------
+  const fmt = (n) => `${n >= 0 ? '+' : '−'}${Math.abs(n).toFixed(1)}`;
+
+  // Best healthy starting lineup's PPG: fill dedicated slots first, then flex
+  // slots from most to least restrictive, each with the best player left.
+  const LINEUP_ELIG = { ...FLEX_ELIG, SUPER_FLEX: ['QB', 'RB', 'WR', 'TE'] };
+  function lineupPPG(list, rosterPositions) {
+    const pool = list.filter((p) => !p.out).sort((a, b) => b.ppg - a.ppg);
+    const used = new Set();
+    let t = 0;
+    const take = (elig) => {
+      const p = pool.find((x) => !used.has(x) && elig.includes(x.pos));
+      if (p) { used.add(p); t += p.ppg; }
+    };
+    const rp = rosterPositions || [];
+    for (const slot of rp) if (POS4.includes(slot)) take([slot]);
+    rp.filter((slot) => LINEUP_ELIG[slot]).sort((a, b) => LINEUP_ELIG[a].length - LINEUP_ELIG[b].length)
+      .forEach((slot) => take(LINEUP_ELIG[slot]));
+    return t;
+  }
+
+  // Per-position strength (for the % of median view) and true lineup PPG.
+  function profile(list, W) {
+    const s = Object.fromEntries(POS4.map((p) => [p, strength(list, p, W)]));
+    return { s, ppg: lineupPPG(list, sl.league?.roster_positions) };
+  }
+
+  function analyzeTrade() {
+    if (sl.myTeam == null || sl.partner == null || !state.get.length || !state.give.length) return null;
+    return evalTrade(sl.partner, state.get, state.give);
+  }
+
+  // Rosters after the trade, plus how likely team `rid` is to accept.
+  function evalTrade(rid, getList, giveList) {
+    const me = sl.teams.get(sl.myTeam), them = sl.teams.get(rid);
+    const getIds = new Set(getList), giveIds = new Set(giveList);
+    const getPs = them.players.filter((p) => p.id && getIds.has(p.id));
+    const givePs = me.players.filter((p) => p.id && giveIds.has(p.id));
+    if (getPs.length !== getList.length || givePs.length !== giveList.length) return { mismatch: true };
+    const sum = (ids) => ids.reduce((t, id) => t + valueOf(byId.get(id)), 0);
+
+    const A = analyze();
+    const { W, ratio } = A;
+    const meAfter = [...me.players.filter((p) => !giveIds.has(p.id)), ...getPs];
+    const themAfter = [...them.players.filter((p) => !getIds.has(p.id)), ...givePs];
+    const mb = profile(me.players, W), ma = profile(meAfter, W);
+    const tb = profile(them.players, W), ta = profile(themAfter, W);
+    const r = (rid, p, s) => ratio(rid, p, s);
+
+    // Value from their side, with the consolidation premium: the side
+    // sending more players needs to send more raw value.
+    const theyGet = sum(giveList), theyGive = sum(getList);
+    const extra = giveList.length - getList.length; // >0: you send more players
+    const k = 1 + CONSOLIDATION * Math.abs(extra);
+    const theyGetAdj = extra > 0 ? theyGet / k : theyGet;
+    const theyGiveAdj = extra < 0 ? theyGive / k : theyGive;
+    const valuePct = (theyGetAdj - theyGiveAdj) / Math.max(theyGiveAdj, 1);
+
+    const wp = winPct(them), seller = wp < 0.45, contender = wp >= 0.6;
+    const injuredToThem = givePs.filter((p) => p.out);
+    const themPpg = ta.ppg - tb.ppg, mePpg = ma.ppg - mb.ppg;
+
+    let score = Math.max(-1.2, Math.min(1.2, valuePct * 4));
+    score += Math.max(-0.6, Math.min(0.6, themPpg / 5));
+    if (seller) score += 0.15;
+    if (injuredToThem.length) score += contender ? -0.05 : seller ? -0.5 : -0.2;
+    const odds = 1 / (1 + Math.exp(-3 * score));
+    const verdict = odds >= 0.65 ? ['Likely to accept', 'win'] : odds >= 0.4 ? ['Could go either way', 'fair']
+      : odds >= 0.2 ? ['Unlikely to accept', 'lose'] : ['Very unlikely to accept', 'lose'];
+
+    // Reasons from their point of view.
+    const why = [];
+    const vp = Math.round(valuePct * 100);
+    why.push(vp >= 3 ? `They win on value by ${vp}%${extra ? ' (after the consolidation premium)' : ''}`
+      : vp <= -3 ? `They lose ${-vp}% on value${extra ? ' (after the consolidation premium)' : ''}`
+      : 'Roughly even on value');
+    why.push(`Their lineup: ${fmt(themPpg)} PPG per week`);
+    for (const p of POS4) {
+      if (!W[p].length) continue;
+      const before = r(rid, p, tb.s[p]), after = r(rid, p, ta.s[p]);
+      if (before < 0.95 && after - before >= 0.08) why.push(`Fills their hole at ${p} (${pct(before)} → ${pct(after)} of median)`);
+      else if (after < 0.9 && before - after >= 0.08) why.push(`Leaves them thin at ${p} (${pct(before)} → ${pct(after)} of median)`);
+    }
+    if (seller) why.push(`${recStr(them)} record: losing teams are usually more open to deals`);
+    if (injuredToThem.length) {
+      const names = injuredToThem.map((p) => `${esc(p.name)} (${esc(p.inj)})`).join(', ');
+      why.push(contender ? `${recStr(them)} contender can afford to wait on ${names}`
+        : seller ? `Rebuilding at ${recStr(them)}, so they won't want to wait on ${names}`
+        : `They'd be waiting on ${names}`);
+    }
+    if (extra > 0) why.push(`They'd have to drop ${extra} player${extra === 1 ? '' : 's'} to make room`);
+
+    // Your side.
+    const mine = [`Your lineup: ${fmt(mePpg)} PPG per week`];
+    for (const p of POS4) {
+      if (!W[p].length) continue;
+      const before = r(sl.myTeam, p, mb.s[p]), after = r(sl.myTeam, p, ma.s[p]);
+      if (before < 0.95 && after - before >= 0.08) mine.push(`Fixes your ${p} (${pct(before)} → ${pct(after)} of median)`);
+      else if (after < 0.9 && before - after >= 0.08) mine.push(`Opens a hole at ${p} (${pct(before)} → ${pct(after)} of median)`);
+    }
+    const outGet = getPs.filter((p) => p.out);
+    if (outGet.length) mine.push(`You'd be waiting on ${outGet.map((p) => `${esc(p.name)} (${esc(p.inj)})`).join(', ')}`);
+    if (extra < 0) mine.push(`You'd have to drop ${-extra} player${extra === -1 ? '' : 's'} to make room`);
+
+    const rows = POS4.filter((p) => W[p].length).map((p) => ({
+      pos: p,
+      me: [r(sl.myTeam, p, mb.s[p]), r(sl.myTeam, p, ma.s[p])],
+      them: [r(rid, p, tb.s[p]), r(rid, p, ta.s[p])],
+    }));
+    return { them, odds, verdict, why, mine, rows, mePpg, themPpg, themAfter: ta.s };
+  }
+
+  function renderAnalysis() {
+    const card = $('#analysis');
+    const a = analyzeTrade();
+    if (!a) { card.hidden = true; return; }
+    card.hidden = false;
+    if (a.mismatch) {
+      $('#analysis-body').innerHTML = '<div class="hint">Roster analysis needs every “You get” player on your trade partner’s roster and every “You give” player on yours.</div>';
+      return;
+    }
+    const cell = ([b, af]) => {
+      const cls = af - b >= 0.03 ? 'up' : b - af >= 0.03 ? 'down' : '';
+      return `<td class="${cls}">${pct(b)} → <b>${pct(af)}</b></td>`;
+    };
+    const steps = 5, filled = Math.max(1, Math.round(a.odds * steps));
+    $('#analysis-body').innerHTML = `
+      <div class="accept ${a.verdict[1]}">
+        <div class="big">${a.verdict[0]}</div>
+        <div class="meter">${Array.from({ length: steps }, (_, i) => `<i class="${i < filled ? 'on' : ''}"></i>`).join('')}</div>
+      </div>
+      <table class="impact">
+        <thead><tr><th></th><th>You</th><th>${esc(a.them.name)}</th></tr></thead>
+        <tbody>${a.rows.map((row) => `<tr><th>${row.pos}</th>${cell(row.me)}${cell(row.them)}</tr>`).join('')}
+          <tr class="tot"><th>PPG</th><td class="${a.mePpg > 0.2 ? 'up' : a.mePpg < -0.2 ? 'down' : ''}">${fmt(a.mePpg)}</td><td class="${a.themPpg > 0.2 ? 'up' : a.themPpg < -0.2 ? 'down' : ''}">${fmt(a.themPpg)}</td></tr>
+        </tbody>
+      </table>
+      <div class="hint">Healthy starters' YTD PPG as % of league median, before → after.</div>
+      <h3>Why they would or wouldn't accept</h3>
+      <ul class="why">${a.why.map((w) => `<li>${w}</li>`).join('')}</ul>
+      <h3>For you</h3>
+      <ul class="why">${a.mine.map((w) => `<li>${w}</li>`).join('')}</ul>`;
+  }
 
   // ---------- init ----------
   syncToggles();

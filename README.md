@@ -47,3 +47,8 @@ node scripts/update-values.js "https://sports.yahoo.com/fantasy/article/2026-tra
   position, and suggests trades with teams that are deep there and thin where you're strong.
   Losing teams rank higher as likely sellers; injured players (IR/Out/Doubtful/PUP/Sus) are only
   pitched to winning teams, who can afford to wait.
+- Trade analysis: for any trade between you and a Sleeper league-mate, shows both rosters'
+  positional strength before → after, each side's best-lineup PPG change, and how likely the
+  other team is to accept (value after the consolidation premium, their lineup change, record,
+  injured players, roster spots), with the reasons. The trade finder uses the same model, so
+  every idea is tagged Likely / Could go either way / Unlikely and never makes your lineup worse.
