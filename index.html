@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1216">
+<title>Boone Trade Calculator</title>
+<style>
+  :root {
+    --bg: #0f1216;
+    --surface: #171b21;
+    --surface-2: #1f252d;
+    --border: #2b323c;
+    --text: #e8ecf1;
+    --muted: #8b95a3;
+    --accent: #4c9aff;
+    --win: #2fbf71;
+    --fair: #e3b341;
+    --lose: #f0564a;
+    --radius: 14px;
+    --tap: 48px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+  button, input, select { font: inherit; color: inherit; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+
+  header { padding: 20px 0 8px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  .meta { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .meta.err { color: var(--lose); }
+
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+  .seg {
+    display: flex; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 3px;
+  }
+  .seg button {
+    flex: 1; min-height: 42px; border: 0; background: none; border-radius: 999px;
+    font-weight: 600; font-size: 15px; color: var(--muted); cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 14px;
+  }
+  .side-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .side-head h2 { font-size: 18px; margin: 0; }
+  .side-total { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .search { position: relative; }
+  .search input {
+    width: 100%; min-height: var(--tap); padding: 0 14px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    font-size: 16px; outline: none;
+  }
+  .search input:focus { border-color: var(--accent); }
+  .results {
+    list-style: none; margin: 6px 0 0; padding: 0;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    max-height: 320px; overflow-y: auto;
+  }
+  .results:empty { display: none; }
+
+  .row {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    min-height: var(--tap); padding: 8px 12px; border: 0; background: none; text-align: left;
+    cursor: pointer; border-bottom: 1px solid var(--border);
+  }
+  .row:last-child { border-bottom: 0; }
+  .row:active { background: rgba(255,255,255,.05); }
+  .row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .val { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
+  .row .x { color: var(--muted); font-size: 20px; line-height: 1; width: 20px; text-align: center; }
+  .row[disabled] { opacity: .4; cursor: default; }
+  .row.on { background: rgba(76,154,255,.12); }
+
+  .pos {
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 3px 6px; border-radius: 6px;
+    min-width: 32px; text-align: center; flex: none;
+  }
+  .pos.QB { background: #3b2a4d; color: #d6b4ff; }
+  .pos.RB { background: #1e3d33; color: #7fe0b5; }
+  .pos.WR { background: #1d3550; color: #8ec5ff; }
+  .pos.TE { background: #4a3520; color: #ffc68a; }
+  .pos.X  { background: var(--surface-2); color: var(--muted); }
+
+  .picked { list-style: none; margin: 10px 0 0; padding: 0; }
+  .picked .row { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; }
+  .empty { color: var(--muted); font-size: 14px; padding: 6px 2px 0; }
+
+  .verdict { border-width: 2px; }
+  .verdict .big { font-size: 22px; font-weight: 800; }
+  .verdict .sub { color: var(--muted); margin-top: 4px; }
+  .verdict.win  { border-color: var(--win); }  .verdict.win  .big { color: var(--win); }
+  .verdict.fair { border-color: var(--fair); } .verdict.fair .big { color: var(--fair); }
+  .verdict.lose { border-color: var(--lose); } .verdict.lose .big { color: var(--lose); }
+  .note {
+    margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+    background: var(--surface-2); font-size: 14px; border-left: 3px solid var(--fair);
+  }
+
+  .bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+    background: rgba(15,18,22,.94); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+  }
+  .bar .wrap { display: flex; align-items: center; gap: 12px; }
+  .bar .nums { flex: 1; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--muted); }
+  .bar .nums b { color: var(--text); font-size: 18px; }
+  .bar .diff { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .diff.win { color: var(--win); } .diff.fair { color: var(--fair); } .diff.lose { color: var(--lose); }
+  .btn {
+    min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface-2); font-weight: 600; cursor: pointer;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  details.card > summary {
+    list-style: none; cursor: pointer; font-weight: 700; font-size: 17px;
+    min-height: 28px; display: flex; align-items: center; justify-content: space-between;
+  }
+  details.card > summary::-webkit-details-marker { display: none; }
+  details.card > summary::after { content: "▾"; color: var(--muted); }
+  details[open].card > summary::after { content: "▴"; }
+  .form { display: grid; gap: 10px; margin-top: 12px; }
+  .form label { font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
+  .form input, .form select {
+    min-height: var(--tap); padding: 0 12px; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 10px; font-size: 16px; width: 100%;
+  }
+  .inline { display: flex; gap: 8px; }
+  .inline input { flex: 1; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status.err { color: var(--lose); }
+
+  .roster-toggle {
+    margin-top: 10px; width: 100%; min-height: 44px; border-radius: 10px;
+    border: 1px dashed var(--border); background: none; color: var(--accent); font-weight: 600; cursor: pointer;
+  }
+  .roster { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  footer { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0 20px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Boone Trade Calculator</h1>
+    <div class="meta" id="meta">Loading values…</div>
+  </header>
+
+  <div class="toggles">
+    <div class="seg" role="group" aria-label="Scoring">
+      <button data-scoring="half" aria-pressed="true">Half PPR</button>
+      <button data-scoring="ppr" aria-pressed="false">PPR</button>
+    </div>
+    <div class="seg" role="group" aria-label="QB format">
+      <button data-qb="1qb" aria-pressed="true">1QB</button>
+      <button data-qb="sf" aria-pressed="false">Superflex</button>
+    </div>
+  </div>
+
+  <section class="card" data-side="get">
+    <div class="side-head"><h2>You get</h2><span class="side-total" id="total-get">0</span></div>
+    <div class="search">
+      <input type="search" placeholder="Search players…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <ul class="results"></ul>
+    </div>
+    <ul class="picked"></ul>
+    <div class="roster-slot"></div>
+  </section>
+
+  <section class="card" data-side="give">
+    <div class="side-head"><h2>You give</h2><span class="side-total" id="total-give">0</span></div>
+    <div class="search">
+      <input type="search" placeholder="Search players…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <ul class="results"></ul>
+    </div>
+    <ul class="picked"></ul>
+    <div class="roster-slot"></div>
+  </section>
+
+  <section class="card verdict" id="verdict" hidden>
+    <div class="big" id="verdict-big"></div>
+    <div class="sub" id="verdict-sub"></div>
+    <div class="note" id="consolidation" hidden></div>
+  </section>
+
+  <details class="card" id="sleeper">
+    <summary>Import from Sleeper</summary>
+    <div class="form">
+      <label>Sleeper username
+        <div class="inline">
+          <input id="sl-user" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="username">
+          <button class="btn primary" id="sl-load">Load</button>
+        </div>
+      </label>
+      <label id="sl-league-wrap" hidden>League
+        <select id="sl-league"></select>
+      </label>
+      <label id="sl-opp-wrap" hidden>Trade partner
+        <select id="sl-opp"></select>
+      </label>
+      <div class="status" id="sl-status"></div>
+    </div>
+  </details>
+
+  <footer>
+    Values: Justin Boone's rest-of-season Trade Value Charts, Yahoo Sports.
+    <span id="sources"></span>
+  </footer>
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="nums">Get <b id="bar-get">0</b> · Give <b id="bar-give">0</b></div>
+    <div class="diff" id="bar-diff">±0</div>
+    <button class="btn" id="clear">Clear</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- helpers ----------
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = {
+    get(k, fallback) { try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* quota / private mode */ } },
+  };
+
+  // Must match normalizeKey() in scripts/update-values.js.
+  function normalizeKey(name) {
+    return String(name)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[.'’`,]/g, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/\s+(jr|sr|ii|iii|iv|v)$/g, '')
+      .trim();
+  }
+  const idOf = (p) => `${p.pos}:${p.key}`;
+
+  // ---------- state ----------
+  const settings = Object.assign({ scoring: 'half', qb: '1qb' }, store.get('btc.settings', {}));
+  const state = { get: [], give: [] };   // arrays of player ids
+  let players = [];                       // from values.json
+  const byId = new Map();
+  const byKey = new Map();                // key -> [players] (for Sleeper matching)
+  const rosters = { get: null, give: null }; // Sleeper roster lists: [{ name, pos, id|null }]
+
+  function valueOf(p) {
+    if (!p) return 0;
+    if (p.pos === 'QB') return (settings.qb === 'sf' ? p.qb2 : p.qb1) ?? 0;
+    return (settings.scoring === 'ppr' ? p.ppr : p.half) ?? 0;
+  }
+
+  // ---------- data ----------
+  async function loadValues() {
+    try {
+      const res = await fetch('values.json', { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      players = data.players;
+      for (const p of players) {
+        byId.set(idOf(p), p);
+        if (!byKey.has(p.key)) byKey.set(p.key, []);
+        byKey.get(p.key).push(p);
+      }
+      const when = data.updated
+        ? new Date(data.updated).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'unknown';
+      $('#meta').textContent = `Week ${data.week} chart · updated ${when}`;
+      if (data.sources) {
+        $('#sources').innerHTML = Object.entries(data.sources)
+          .map(([pos, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(pos)}</a>`).join(' · ');
+      }
+      readHash();
+      render();
+    } catch (e) {
+      $('#meta').textContent = `Couldn't load values.json (${e.message}).`;
+      $('#meta').classList.add('err');
+    }
+  }
+
+  // ---------- toggles ----------
+  function syncToggles() {
+    $$('[data-scoring]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scoring === settings.scoring)));
+    $$('[data-qb]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.qb === settings.qb)));
+  }
+  $$('[data-scoring]').forEach((b) => b.addEventListener('click', () => { settings.scoring = b.dataset.scoring; saveSettings(); }));
+  $$('[data-qb]').forEach((b) => b.addEventListener('click', () => { settings.qb = b.dataset.qb; saveSettings(); }));
+  function saveSettings() { store.set('btc.settings', settings); syncToggles(); render(); refreshSearches(); }
+
+  // ---------- trade edits ----------
+  function sideOf(id) { return state.get.includes(id) ? 'get' : state.give.includes(id) ? 'give' : null; }
+  function toggle(side, id) {
+    const cur = sideOf(id);
+    if (cur) state[cur] = state[cur].filter((x) => x !== id);
+    if (cur !== side) state[side].push(id);
+    render();
+  }
+
+  // ---------- search ----------
+  function playerRow(p, { side, removable } = {}) {
+    const on = side && sideOf(idOf(p)) === side;
+    return `<li><button class="row${on ? ' on' : ''}" data-id="${esc(idOf(p))}">
+      <span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>
+      <span class="name">${esc(p.name)}</span>
+      <span class="val">${valueOf(p)}</span>
+      ${removable ? '<span class="x" aria-label="Remove">×</span>' : ''}
+    </button></li>`;
+  }
+
+  function search(q) {
+    const nq = normalizeKey(q);
+    if (!nq) return [];
+    const starts = [], contains = [];
+    for (const p of players) {
+      if (p.key.startsWith(nq) || p.key.split(' ').some((w) => w.startsWith(nq))) starts.push(p);
+      else if (p.key.includes(nq)) contains.push(p);
+    }
+    const byVal = (a, b) => valueOf(b) - valueOf(a);
+    return [...starts.sort(byVal), ...contains.sort(byVal)].slice(0, 12);
+  }
+
+  function refreshSearches() {
+    $$('section[data-side]').forEach((sec) => {
+      const input = $('input', sec);
+      $('.results', sec).innerHTML = search(input.value).map((p) => playerRow(p, { side: sec.dataset.side })).join('');
+    });
+  }
+
+  $$('section[data-side]').forEach((sec) => {
+    const side = sec.dataset.side;
+    const input = $('input', sec);
+    const results = $('.results', sec);
+    input.addEventListener('input', refreshSearches);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { const first = $('.row', results); if (first) first.click(); }
+      if (e.key === 'Escape') { input.value = ''; refreshSearches(); }
+    });
+    results.addEventListener('click', (e) => {
+      const btn = e.target.closest('.row'); if (!btn) return;
+      toggle(side, btn.dataset.id);
+      input.value = '';
+      refreshSearches();
+      input.focus();
+    });
+    $('.picked', sec).addEventListener('click', (e) => {
+      const btn = e.target.closest('.row'); if (btn) toggle(side, btn.dataset.id);
+    });
+    $('.roster-slot', sec).addEventListener('click', (e) => {
+      if (e.target.closest('.roster-toggle')) {
+        sec.dataset.rosterOpen = sec.dataset.rosterOpen === '1' ? '0' : '1';
+        renderRoster(side);
+        return;
+      }
+      const btn = e.target.closest('.row'); if (btn && btn.dataset.id) toggle(side, btn.dataset.id);
+    });
+  });
+
+  // ---------- render ----------
+  function total(side) { return state[side].reduce((s, id) => s + valueOf(byId.get(id)), 0); }
+
+  function render() {
+    for (const side of ['get', 'give']) {
+      const sec = $(`section[data-side="${side}"]`);
+      const list = state[side].map((id) => byId.get(id)).filter(Boolean)
+        .sort((a, b) => valueOf(b) - valueOf(a));
+      $('.picked', sec).innerHTML = list.length
+        ? list.map((p) => playerRow(p, { removable: true })).join('')
+        : `<li class="empty">${side === 'get' ? 'Players you receive' : 'Players you send away'} — search or pick from a roster.</li>`;
+      $(`#total-${side}`).textContent = total(side);
+      renderRoster(side);
+    }
+    renderVerdict();
+    writeHash();
+  }
+
+  function renderVerdict() {
+    const g = total('get'), v = total('give');
+    const diff = g - v;
+    const big = Math.max(g, v);
+    // "Fair" band: within 3 points or 8% of the larger side.
+    const fair = Math.abs(diff) <= Math.max(3, big * 0.08);
+    const cls = fair ? 'fair' : diff > 0 ? 'win' : 'lose';
+
+    $('#bar-get').textContent = g;
+    $('#bar-give').textContent = v;
+    const bd = $('#bar-diff');
+    bd.textContent = diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : '±0';
+    bd.className = `diff ${state.get.length || state.give.length ? cls : ''}`;
+
+    const card = $('#verdict');
+    if (!state.get.length || !state.give.length) { card.hidden = true; return; }
+    card.hidden = false;
+    card.className = `card verdict ${cls}`;
+    const pct = big ? Math.round((Math.abs(diff) / big) * 100) : 0;
+    $('#verdict-big').textContent =
+      fair ? 'Fair trade' :
+      diff > 0 ? (pct >= 25 ? 'Big win for you' : 'You win this trade') :
+      (pct >= 25 ? 'Big loss for you' : 'You lose this trade');
+    $('#verdict-sub').textContent = diff === 0
+      ? `Dead even at ${g} points each.`
+      : `You ${diff > 0 ? 'gain' : 'give up'} ${Math.abs(diff)} points of value (${pct}% of the bigger side).`;
+
+    // Consolidation: in an uneven-count deal, the side receiving the single
+    // best player usually deserves a premium (roster spots + top-end talent).
+    const note = $('#consolidation');
+    if (state.get.length !== state.give.length) {
+      let best = null, bestSide = null;
+      for (const side of ['get', 'give']) for (const id of state[side]) {
+        const p = byId.get(id);
+        if (p && (!best || valueOf(p) > valueOf(best))) { best = p; bestSide = side; }
+      }
+      const n = Math.max(state.get.length, state.give.length), m = Math.min(state.get.length, state.give.length);
+      note.hidden = false;
+      note.innerHTML = `<b>${n}-for-${m} consolidation.</b> ${esc(best.name)} is the best player in the deal. ` +
+        (bestSide === 'get'
+          ? `You're getting that player, so a slightly negative total can still be fair — the side landing the best player usually deserves to pay a premium, and you also free up a roster spot.`
+          : `Your partner is getting that player, so they usually owe you a premium — ask for more than an even total.`);
+    } else {
+      note.hidden = true;
+    }
+  }
+
+  function renderRoster(side) {
+    const sec = $(`section[data-side="${side}"]`);
+    const slot = $('.roster-slot', sec);
+    const roster = rosters[side];
+    if (!roster) { slot.innerHTML = ''; return; }
+    const open = sec.dataset.rosterOpen === '1';
+    const label = side === 'get' ? 'their roster' : 'my roster';
+    let html = `<button class="roster-toggle">${open ? 'Hide' : 'Pick from'} ${label} (${roster.length})</button>`;
+    if (open) {
+      const items = roster.map((r) => {
+        const p = r.id && byId.get(r.id);
+        return { r, p, v: p ? valueOf(p) : -1 };
+      }).sort((a, b) => b.v - a.v);
+      html += '<ul class="roster">' + items.map(({ r, p }) => p
+        ? playerRow(p, { side })
+        : `<li><button class="row" disabled><span class="pos ${esc(r.pos || 'X')}">${esc(r.pos || '—')}</span><span class="name">${esc(r.name)}</span><span class="val">—</span></button></li>`
+      ).join('') + '</ul>';
+    }
+    slot.innerHTML = html;
+  }
+
+  $('#clear').addEventListener('click', () => { state.get = []; state.give = []; render(); });
+
+  // ---------- shareable URL hash: #get=RB:bijan robinson,...&give=... ----------
+  function writeHash() {
+    const enc = (ids) => ids.map(encodeURIComponent).join(',');
+    const h = (state.get.length || state.give.length) ? `#get=${enc(state.get)}&give=${enc(state.give)}` : '';
+    history.replaceState(null, '', location.pathname + location.search + h);
+  }
+  function readHash() {
+    const params = new URLSearchParams(location.hash.slice(1));
+    for (const side of ['get', 'give']) {
+      const raw = params.get(side);
+      if (!raw) continue;
+      state[side] = raw.split(',').map((s) => { try { return decodeURIComponent(s); } catch { return s; } })
+        .filter((id) => byId.has(id) && !state.get.includes(id) && !state.give.includes(id));
+    }
+  }
+
+  // ---------- Sleeper import ----------
+  const SL = 'https://api.sleeper.app/v1';
+  const slStatus = (msg, err) => { const el = $('#sl-status'); el.textContent = msg; el.classList.toggle('err', !!err); };
+  const getJson = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Sleeper returned HTTP ${res.status}`);
+    return res.json();
+  };
+  const sl = { user: null, leagues: [], rosters: [], users: [], playerMap: null };
+
+  // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE map for a day.
+  async function sleeperPlayers() {
+    if (sl.playerMap) return sl.playerMap;
+    const cached = store.get('btc.slPlayers', null);
+    if (cached && Date.now() - cached.at < 24 * 3600e3) return (sl.playerMap = cached.map);
+    slStatus('Downloading Sleeper player list (one-time, ~5 MB)…');
+    const all = await getJson(`${SL}/players/nfl`);
+    const map = {};
+    for (const [id, p] of Object.entries(all)) {
+      if (!['QB', 'RB', 'WR', 'TE'].includes(p.position)) continue;
+      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position];
+    }
+    store.set('btc.slPlayers', { at: Date.now(), map });
+    return (sl.playerMap = map);
+  }
+
+  function matchValue(name, pos) {
+    const cands = byKey.get(normalizeKey(name)) || [];
+    const p = cands.find((c) => c.pos === pos) || cands[0];
+    return p ? idOf(p) : null;
+  }
+
+  function rosterFor(ownerId, pmap) {
+    const r = sl.rosters.find((x) => x.owner_id === ownerId || (x.co_owners || []).includes(ownerId));
+    if (!r) return [];
+    return (r.players || []).filter((pid) => pmap[pid]).map((pid) => {
+      const [name, pos] = pmap[pid];
+      return { name, pos, id: matchValue(name, pos) };
+    });
+  }
+
+  $('#sl-load').addEventListener('click', async () => {
+    const username = $('#sl-user').value.trim();
+    if (!username) return slStatus('Enter a Sleeper username.', true);
+    try {
+      slStatus('Looking up user…');
+      const user = await getJson(`${SL}/user/${encodeURIComponent(username)}`);
+      if (!user) throw new Error(`No Sleeper user named "${username}".`);
+      sl.user = user;
+      const nflState = await getJson(`${SL}/state/nfl`);
+      const season = nflState.league_season || nflState.season;
+      sl.leagues = await getJson(`${SL}/user/${user.user_id}/leagues/nfl/${season}`);
+      if (!sl.leagues.length) throw new Error(`No ${season} NFL leagues for ${username}.`);
+      const sel = $('#sl-league');
+      sel.innerHTML = '<option value="">Choose a league…</option>' +
+        sl.leagues.map((l) => `<option value="${esc(l.league_id)}">${esc(l.name)}</option>`).join('');
+      $('#sl-league-wrap').hidden = false;
+      store.set('btc.slUser', username);
+      const last = store.get('btc.slLeague', '');
+      if (last && sl.leagues.some((l) => l.league_id === last)) { sel.value = last; await loadLeague(last); }
+      else slStatus(`Found ${sl.leagues.length} league${sl.leagues.length === 1 ? '' : 's'}.`);
+    } catch (e) { slStatus(e.message, true); }
+  });
+
+  $('#sl-league').addEventListener('change', (e) => e.target.value && loadLeague(e.target.value));
+
+  async function loadLeague(leagueId) {
+    try {
+      slStatus('Loading rosters…');
+      store.set('btc.slLeague', leagueId);
+      const league = sl.leagues.find((l) => l.league_id === leagueId);
+      [sl.rosters, sl.users] = await Promise.all([
+        getJson(`${SL}/league/${leagueId}/rosters`),
+        getJson(`${SL}/league/${leagueId}/users`),
+      ]);
+      const pmap = await sleeperPlayers();
+
+      // Match the toggles to the league's format.
+      const rec = league?.scoring_settings?.rec;
+      if (rec === 1) settings.scoring = 'ppr'; else if (rec === 0.5) settings.scoring = 'half';
+      if (league?.roster_positions) settings.qb = league.roster_positions.includes('SUPER_FLEX') ? 'sf' : '1qb';
+      store.set('btc.settings', settings); syncToggles();
+
+      rosters.give = rosterFor(sl.user.user_id, pmap);
+      const opp = $('#sl-opp');
+      const others = sl.users.filter((u) => u.user_id !== sl.user.user_id);
+      opp.innerHTML = '<option value="">Choose a team…</option>' + others.map((u) =>
+        `<option value="${esc(u.user_id)}">${esc(u.metadata?.team_name || u.display_name)}${u.metadata?.team_name ? ` (${esc(u.display_name)})` : ''}</option>`
+      ).join('');
+      $('#sl-opp-wrap').hidden = false;
+      rosters.get = null;
+      $('section[data-side="give"]').dataset.rosterOpen = '1';
+      const unmatched = rosters.give.filter((r) => !r.id).length;
+      slStatus(`Loaded your roster (${rosters.give.length} players${unmatched ? `, ${unmatched} not on Boone's chart` : ''}). Pick a trade partner.`);
+      render();
+    } catch (e) { slStatus(e.message, true); }
+  }
+
+  $('#sl-opp').addEventListener('change', (e) => {
+    if (!e.target.value || !sl.playerMap) return;
+    rosters.get = rosterFor(e.target.value, sl.playerMap);
+    $('section[data-side="get"]').dataset.rosterOpen = '1';
+    slStatus('Tap players on either roster to add them to the trade.');
+    render();
+  });
+
+  // ---------- init ----------
+  syncToggles();
+  const savedUser = store.get('btc.slUser', '');
+  if (savedUser) $('#sl-user').value = savedUser;
+  loadValues();
+})();
+</script>
+</body>
+</html>

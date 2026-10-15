@@ -1,0 +1,46 @@
+name: Update trade values
+
+on:
+  schedule:
+    # 6pm Central on Wednesday and Thursday. GitHub cron is UTC-only, so we
+    # list both offsets: 23:00 UTC = 6pm CDT (Mar-Nov), 00:00 UTC the next
+    # day = 6pm CST (Nov-Mar). The off-season run lands at 5pm or 7pm,
+    # which is harmless: the scrape is idempotent and only commits on change.
+    - cron: '0 23 * * 3,4'
+    - cron: '0 0 * * 4,5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-values
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Fails the job (and emails you) if a position is missing or returns
+      # fewer than 20 players, which usually means Yahoo changed its markup.
+      - name: Scrape Yahoo trade value charts
+        run: node scripts/update-values.js
+
+      - name: Commit values.json if changed
+        run: |
+          if git diff --quiet -- values.json; then
+            echo "values.json unchanged - nothing to commit."
+            exit 0
+          fi
+          week=$(node -p "require('./values.json').week")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add values.json
+          git commit -m "Update trade values (week ${week})"
+          git push
