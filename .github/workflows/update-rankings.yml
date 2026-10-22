@@ -1,0 +1,46 @@
+name: Update start/sit rankings
+
+on:
+  schedule:
+    # Boone updates his weekly rankings several times a week, with a final
+    # version Sunday morning. Check hourly, plus every 15 minutes Sunday
+    # morning ET (13:00-17:00 UTC) before the early games. Only commits when
+    # his last-updated time changes, so most runs are no-ops.
+    - cron: '17 * * * *'
+    - cron: '*/15 13-17 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-rankings
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch Boone's current-week rankings
+        run: node scripts/update-rankings.js
+
+      - name: Commit rankings.json if changed
+        run: |
+          if git diff --quiet -- rankings.json; then
+            echo "rankings.json unchanged - nothing to commit."
+            exit 0
+          fi
+          week=$(node -p "require('./rankings.json').week")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rankings.json
+          git commit -m "Update start/sit rankings (week ${week})"
+          # The trade-values Action may have pushed in the meantime.
+          git pull --rebase
+          git push

@@ -1,7 +1,8 @@
 # Boone Trade Calculator
 
 Mobile-first fantasy football trade calculator built on Justin Boone's weekly
-rest-of-season **Trade Value Charts** from Yahoo Sports.
+rest-of-season **Trade Value Charts** from Yahoo Sports, plus a **Start/Sit** view
+built on his weekly FLEX/QB/K/D/ST rankings.
 
 Live: https://dirtyk.github.io/Boone_Trade/
 
@@ -15,11 +16,31 @@ Live: https://dirtyk.github.io/Boone_Trade/
   position has fewer than 20 players.
 - `.github/workflows/update-values.yml` – runs the scraper Wed + Thu at 6pm Central and commits
   `values.json` only when it changed. Can also be run manually from the Actions tab.
+- `rankings.json` – `{ season, week, updated, lists: { FLEX_HALF, FLEX_PPR, QB, K, DEF } }`, each list
+  `[{ id, name, pos, team, rank, opp }]` where `id` is the Sleeper player id. `updated` is Boone's own
+  last-updated time.
+- `scripts/update-rankings.js` – Node 18+, no dependencies. Gets the current week from Sleeper and pulls
+  Boone's rankings from Yahoo's `/api/fanPro` JSON feed (the feed his rankings articles load client-side;
+  it has no CORS headers, so the page can't call it directly), matches names to Sleeper ids, and rewrites
+  `rankings.json`. Leaves the file alone if he hasn't posted the current week yet.
+- `.github/workflows/update-rankings.yml` – runs hourly (every 15 minutes Sunday morning ET) and commits
+  `rankings.json` only when Boone's last-updated time changes.
+
+## Start/Sit
+
+Pick one of kkholiday's Sleeper leagues (hard-coded as `SS_USER` in `index.html`). The page loads your
+roster and the lineup set in Sleeper, then builds Boone's lineup: single-position slots (QB/RB/WR/TE/K/DEF)
+first with the best-ranked player at that position, then the league's flex slots (W/R, W/T, FLEX, SUPER_FLEX
+— most restrictive first) with the best-ranked eligible player left. FLEX uses his Full-PPR list when the
+league gives a full point per reception, Half-PPR otherwise. For SUPER_FLEX a QB at QB #n competes as FLEX
+#2n (`SF_QB_MULT`). Players Sleeper lists as Out/IR/PUP/Sus are never started. It shows the Start/Sit moves,
+the full lineup (new starters highlighted) and the bench with ranks.
 
 ## Run the scraper locally
 
 ```bash
 node scripts/update-values.js
+node scripts/update-rankings.js
 ```
 
 If auto-discovery ever fails, pass one or more article URLs directly (the other positions are

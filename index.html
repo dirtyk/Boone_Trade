@@ -190,6 +190,22 @@
   .tag.win { background: rgba(47,191,113,.15); color: var(--win); }
   .tag.fair { background: rgba(227,179,65,.15); color: var(--fair); }
   .tag.lose { background: rgba(240,86,74,.15); color: var(--lose); }
+  .views { margin: 12px 0 0; }
+  .pos.K   { background: #2c3340; color: #c3cad6; }
+  .pos.DEF { background: #3d2430; color: #ffa3c4; }
+  .ss-list { list-style: none; margin: 10px 0 0; padding: 0; }
+  .ss-list li { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--border); }
+  .ss-list li:last-child { border-bottom: 0; }
+  .ss-list .name { flex: 1; min-width: 0; }
+  .ss-list .name small { display: block; font-size: 12px; color: var(--muted); }
+  .ss-list .rk { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 14px; white-space: nowrap; }
+  .ss-list li.new { background: rgba(47,191,113,.08); box-shadow: inset 3px 0 0 var(--win); padding-left: 8px; }
+  .ss-list .was { color: var(--lose); }
+  .ss-moves { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+  .ss-moves li { font-size: 15px; }
+  .ss-moves .in { color: var(--win); font-weight: 800; }
+  .ss-moves .out { color: var(--lose); font-weight: 800; }
+  .ss-warn { border-left: 3px solid var(--fair); }
   footer { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0 20px; }
   footer a { color: var(--muted); }
 </style>
@@ -199,8 +215,13 @@
   <header>
     <h1>Boone Trade Calculator</h1>
     <div class="meta" id="meta">Loading values…</div>
+    <div class="seg views" role="group" aria-label="View">
+      <button data-view="trade" aria-pressed="true">Trade</button>
+      <button data-view="startsit" aria-pressed="false">Start/Sit</button>
+    </div>
   </header>
 
+  <div id="view-trade">
   <div class="toggles">
     <div class="seg" role="group" aria-label="Scoring">
       <button data-scoring="half" aria-pressed="true">Half PPR</button>
@@ -277,6 +298,36 @@
       <div class="status" id="sl-status"></div>
     </div>
   </details>
+  </div>
+
+  <div id="view-startsit" hidden>
+    <section class="card">
+      <div class="side-head"><h2>Start/Sit</h2></div>
+      <div class="form" style="margin-top:0">
+        <label>League
+          <select id="ss-league"><option value="">Loading leagues…</option></select>
+        </label>
+      </div>
+      <div class="status" id="ss-status" style="margin-top:8px"></div>
+    </section>
+    <section class="card" id="ss-moves-card" hidden>
+      <div class="side-head"><h2>Lineup changes</h2></div>
+      <div id="ss-moves"></div>
+    </section>
+    <section class="card" id="ss-lineup-card" hidden>
+      <div class="side-head"><h2>Boone's lineup</h2></div>
+      <ul class="ss-list" id="ss-lineup"></ul>
+    </section>
+    <section class="card" id="ss-bench-card" hidden>
+      <div class="side-head"><h2>Bench</h2></div>
+      <ul class="ss-list" id="ss-bench"></ul>
+    </section>
+    <div class="hint" style="text-align:center">
+      Boone's weekly Half/Full-PPR FLEX, QB, K and D/ST rankings, checked hourly.
+      Single-position slots fill first with the best-ranked player there, then flex slots
+      with the best-ranked eligible player left.
+    </div>
+  </div>
 
   <footer>
     Values: Justin Boone's rest-of-season Trade Value Charts, Yahoo Sports.
@@ -284,7 +335,7 @@
   </footer>
 </div>
 
-<div class="bar">
+<div class="bar" id="trade-bar">
   <div class="wrap">
     <div class="nums">Get <b id="bar-get">0</b> · Give <b id="bar-give">0</b></div>
     <div class="diff" id="bar-diff">±0</div>
@@ -586,20 +637,20 @@
   };
   const teamOf = (id) => sl.teams.get(sl.ownerOf.get(id));
 
-  // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE map for a day.
+  // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE/K/DEF map for a day.
   async function sleeperPlayers() {
     if (sl.playerMap) return sl.playerMap;
-    const cached = store.get('btc.slPlayers2', null);
+    const cached = store.get('btc.slPlayers3', null);
     if (cached && Date.now() - cached.at < 24 * 3600e3) return (sl.playerMap = cached.map);
     slStatus('Downloading Sleeper player list (one-time, ~5 MB)…');
     const all = await getJson(`${SL}/players/nfl`);
     const map = {};
     for (const [id, p] of Object.entries(all)) {
-      if (!['QB', 'RB', 'WR', 'TE'].includes(p.position)) continue;
-      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position, p.injury_status || ''];
+      if (!['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(p.position)) continue;
+      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position, p.injury_status || '', p.team || ''];
     }
-    try { localStorage.removeItem('btc.slPlayers'); } catch { /* old cache format */ }
-    store.set('btc.slPlayers2', { at: Date.now(), map });
+    try { localStorage.removeItem('btc.slPlayers'); localStorage.removeItem('btc.slPlayers2'); } catch { /* old cache formats */ }
+    store.set('btc.slPlayers3', { at: Date.now(), map });
     return (sl.playerMap = map);
   }
 
@@ -663,7 +714,7 @@
         const u = userById.get(r.owner_id);
         const name = u ? (u.metadata?.team_name || u.display_name) : `Team ${r.roster_id}`;
         const reserve = new Set(r.reserve || []);
-        const list = (r.players || []).filter((pid) => pmap[pid]).map((pid) => {
+        const list = (r.players || []).filter((pid) => pmap[pid] && POS4.includes(pmap[pid][1])).map((pid) => {
           const [pname, pos, inj] = pmap[pid];
           const st = stats[pid];
           const ppg = st && st[3] > 0 ? st[ptsIdx] / st[3] : 0;
@@ -1170,8 +1221,180 @@
       <ul class="why">${a.mine.map((w) => `<li>${w}</li>`).join('')}</ul>`;
   }
 
+  // ---------- start/sit ----------
+  // Compares the lineup set in Sleeper with the one Boone's current weekly
+  // rankings (rankings.json, refreshed hourly by update-rankings.yml) say to
+  // start. Always kkholiday's leagues, independent of the trade view's import.
+  const SS_USER = 'kkholiday';
+  const SS_ELIG = {
+    QB: ['QB'], RB: ['RB'], WR: ['WR'], TE: ['TE'], K: ['K'], DEF: ['DEF'],
+    FLEX: ['RB', 'WR', 'TE'], WRRB_FLEX: ['RB', 'WR'], REC_FLEX: ['WR', 'TE'], SUPER_FLEX: ['QB', 'RB', 'WR', 'TE'],
+  };
+  // Never recommended to start, even if Boone's list still has them.
+  const SS_UNAVAILABLE = new Set(['Out', 'IR', 'PUP', 'Sus', 'NA', 'DNR', 'COV']);
+  // Boone's QB list isn't on the FLEX list's scale; for SUPER_FLEX, QB #n
+  // competes as if he were FLEX #(n * this).
+  const SF_QB_MULT = 2;
+  const ss = { leagues: null, state: null };
+  const ssStatus = (msg, err) => { const el = $('#ss-status'); el.textContent = msg; el.classList.toggle('err', !!err); };
+
+  async function ssInit() {
+    if (ss.leagues) return;
+    try {
+      ssStatus('Loading your leagues…');
+      const user = await getJson(`${SL}/user/${SS_USER}`);
+      if (!user) throw new Error(`No Sleeper user named "${SS_USER}".`);
+      ss.user = user;
+      ss.state = await getJson(`${SL}/state/nfl`);
+      const season = ss.state.league_season || ss.state.season;
+      ss.leagues = await getJson(`${SL}/user/${user.user_id}/leagues/nfl/${season}`);
+      if (!ss.leagues.length) throw new Error(`No ${season} leagues for ${SS_USER}.`);
+      const sel = $('#ss-league');
+      sel.innerHTML = ss.leagues.map((l) => `<option value="${esc(l.league_id)}">${esc(l.name)}</option>`).join('');
+      const saved = store.get('btc.ssLeague', '');
+      if (ss.leagues.some((l) => l.league_id === saved)) sel.value = saved;
+      await ssLoad(sel.value);
+    } catch (e) { ss.leagues = null; ssStatus(e.message, true); }
+  }
+
+  $('#ss-league').addEventListener('change', (e) => e.target.value && ssLoad(e.target.value));
+
+  async function ssLoad(leagueId) {
+    ['#ss-moves-card', '#ss-lineup-card', '#ss-bench-card'].forEach((s) => ($(s).hidden = true));
+    try {
+      store.set('btc.ssLeague', leagueId);
+      ssStatus('Loading your lineup and Boone\'s latest rankings…');
+      const league = ss.leagues.find((l) => l.league_id === leagueId);
+      const [rosterList, rankRes, pmap] = await Promise.all([
+        getJson(`${SL}/league/${leagueId}/rosters`),
+        fetch('rankings.json', { cache: 'no-cache' }),
+        sleeperPlayers(),
+      ]);
+      if (!rankRes.ok) throw new Error(`Couldn't load rankings.json (HTTP ${rankRes.status}).`);
+      const rk = await rankRes.json();
+      const roster = rosterList.find((r) => r.owner_id === ss.user.user_id || (r.co_owners || []).includes(ss.user.user_id));
+      if (!roster) throw new Error("Couldn't find your team in that league.");
+      const ppr = (league.scoring_settings?.rec || 0) >= 1;
+      const result = ssBuild(league, roster, pmap, rk, ppr);
+      ssRender(result, rk, ppr);
+    } catch (e) { ssStatus(e.message, true); }
+  }
+
+  function ssBuild(league, roster, pmap, rk, ppr) {
+    const ranks = new Map();
+    const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], QB: rk.lists.QB, K: rk.lists.K, DEF: rk.lists.DEF };
+    for (const [list, rows] of Object.entries(lists)) for (const r of rows || []) if (r.id) ranks.set(r.id, { list, ...r });
+
+    const info = (id) => {
+      if (!id || id === '0') return null;
+      const [name, pos, inj, team] = pmap[id] || [];
+      const r = ranks.get(id);
+      return {
+        id, name: name || r?.name || id, pos: pos || r?.pos || '?', team: team || r?.team || '', inj: inj || '',
+        list: r?.list || null, rank: r?.rank || null, opp: r?.opp || '',
+      };
+    };
+
+    const slots = (league.roster_positions || []).filter((s) => !['BN', 'IR', 'TAXI'].includes(s));
+    const current = (roster.starters || []).slice(0, slots.length);
+    while (current.length < slots.length) current.push('0');
+    const currentSet = new Set(current.filter((id) => id && id !== '0'));
+    const inactive = new Set([...(roster.reserve || []), ...(roster.taxi || [])]);
+    const pool = (roster.players || []).filter((id) => !inactive.has(id)).map(info);
+    const healthy = (p) => !SS_UNAVAILABLE.has(p.inj);
+    const key = (p, slot) => {
+      if (!p.rank || !healthy(p)) return null;
+      return slot === 'SUPER_FLEX' && p.list === 'QB' ? p.rank * SF_QB_MULT : p.rank;
+    };
+
+    // Single-position slots first, then flex slots from most to least restrictive.
+    const order = slots.map((slot, i) => ({ slot, i, elig: SS_ELIG[slot] || [slot] }))
+      .sort((a, b) => a.elig.length - b.elig.length || a.i - b.i);
+    const used = new Set();
+    const picks = new Array(slots.length).fill(null);
+    for (const { slot, i, elig } of order) {
+      const cands = pool.filter((p) => !used.has(p.id) && elig.includes(p.pos));
+      let best = null, bestKey = Infinity;
+      for (const c of cands) { const k = key(c, slot); if (k != null && k < bestKey) { best = c; bestKey = k; } }
+      // Nobody ranked (bye, injuries, IDP slot): keep Sleeper's pick, else any healthy body.
+      if (!best) best = cands.find((c) => c.id === current[i]) || cands.find(healthy) || null;
+      if (best) used.add(best.id);
+      picks[i] = best;
+    }
+
+    // Two starters trading places within identical slots (RB1/RB2) isn't a change.
+    const groups = new Map();
+    slots.forEach((s, i) => groups.set(s, [...(groups.get(s) || []), i]));
+    for (const idxs of groups.values()) {
+      if (idxs.length < 2) continue;
+      const placed = new Array(idxs.length).fill(null), rest = [];
+      for (const p of idxs.map((i) => picks[i])) {
+        const at = p ? idxs.findIndex((i, k) => !placed[k] && current[i] === p.id) : -1;
+        if (at !== -1) placed[at] = p; else rest.push(p);
+      }
+      idxs.forEach((i, k) => (picks[i] = placed[k] || rest.shift() || null));
+    }
+
+    const pickSet = new Set(picks.filter(Boolean).map((p) => p.id));
+    const byRank = (a, b) => (a.rank || 999) - (b.rank || 999);
+    return {
+      lineup: slots.map((slot, i) => ({ slot, now: info(current[i]), pick: picks[i], isNew: !!picks[i] && !currentSet.has(picks[i].id) })),
+      start: picks.filter((p) => p && !currentSet.has(p.id)),
+      sit: [...currentSet].filter((id) => !pickSet.has(id)).map(info).sort(byRank),
+      bench: pool.filter((p) => !pickSet.has(p.id)).sort(byRank),
+    };
+  }
+
+  const ssRank = (p) => (p && p.rank ? `${p.list} #${p.rank}` : '—');
+  const ssInj = (p) => (p && p.inj ? `<span class="inj${SS_UNAVAILABLE.has(p.inj) || p.inj === 'Doubtful' ? '' : ' q'}">${esc(INJ_ABBR[p.inj] || p.inj)}</span>` : '');
+  const ssPos = (pos) => `<span class="pos ${['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(pos) ? pos : 'X'}">${esc(pos)}</span>`;
+  const ssSub = (p) => [p.team, p.opp].filter(Boolean).map(esc).join(' · ');
+
+  function ssRender(res, rk, ppr) {
+    const when = rk.updated ? new Date(rk.updated.replace(' ', 'T')) : null;
+    const whenTxt = when && !isNaN(when)
+      ? when.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+      : (rk.updated || 'unknown');
+    const stale = ss.state && ss.state.week && rk.week !== ss.state.week
+      ? ` Boone hasn't posted Week ${ss.state.week} yet.` : '';
+    ssStatus(`Boone's Week ${rk.week} ${ppr ? 'PPR' : 'Half-PPR'} rankings · updated ${whenTxt}.${stale}`, !!stale);
+
+    $('#ss-moves').innerHTML = res.start.length
+      ? `<ul class="ss-moves">${res.start.map((p, i) => {
+          const out = res.sit[i];
+          return `<li><span class="in">Start</span> ${esc(p.name)} <small class="status">(${ssRank(p)})</small>${out ? `<br><span class="out">Sit</span> ${esc(out.name)} <small class="status">(${ssRank(out)})</small>` : ''}</li>`;
+        }).join('')}</ul>`
+      : '<div class="hint" style="margin-top:0">No changes — your Sleeper lineup already matches Boone.</div>';
+
+    $('#ss-lineup').innerHTML = res.lineup.map(({ slot, now, pick, isNew }) => `
+      <li class="${isNew ? 'new' : ''}">
+        ${ssPos(slot === 'SUPER_FLEX' ? 'SF' : slot.replace('_FLEX', '').replace('WRRB', 'W/R').replace('REC', 'W/T'))}
+        <div class="name">${pick ? `${esc(pick.name)}${ssInj(pick)}` : '<span class="status">(empty)</span>'}
+          <small>${pick ? ssSub(pick) : ''}${isNew ? ` · <span class="was">replaces ${now ? esc(now.name) : 'empty slot'}</span>` : ''}</small></div>
+        <span class="rk">${ssRank(pick)}</span>
+      </li>`).join('');
+
+    $('#ss-bench').innerHTML = res.bench.length
+      ? res.bench.map((p) => `<li>${ssPos(p.pos)}<div class="name">${esc(p.name)}${ssInj(p)}<small>${ssSub(p)}</small></div><span class="rk">${ssRank(p)}</span></li>`).join('')
+      : '<li class="hint">Nobody on the bench.</li>';
+
+    ['#ss-moves-card', '#ss-lineup-card', '#ss-bench-card'].forEach((s) => ($(s).hidden = false));
+  }
+
+  function setView(view) {
+    $$('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    $('#view-trade').hidden = view !== 'trade';
+    $('#trade-bar').hidden = view !== 'trade';
+    $('#meta').hidden = view !== 'trade';
+    $('#view-startsit').hidden = view !== 'startsit';
+    store.set('btc.view', view);
+    if (view === 'startsit') ssInit();
+  }
+  $$('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+
   // ---------- init ----------
   syncToggles();
+  setView(store.get('btc.view', 'trade') === 'startsit' ? 'startsit' : 'trade');
   const DEFAULT_SLEEPER_USER = 'kkholiday';
   $('#sl-user').value = store.get('btc.slUser', '') || DEFAULT_SLEEPER_USER;
   // Auto-load the Sleeper user once values are in (roster matching needs them).
