@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Pulls Justin Boone's current-week Start/Sit rankings (FLEX, QB, K, D/ST)
+// Pulls Justin Boone's current-week Start/Sit rankings (FLEX, K, D/ST)
 // and writes rankings.json at the repo root, with every player already
 // matched to his Sleeper player id so the page can join them onto rosters
 // without any name matching.
@@ -29,12 +29,12 @@ const BOONE = '317';
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
 
-// rankings.json list name -> [feed position, scoring]. QB/K/DST don't change
-// with reception scoring; FLEX has separate Half and Full PPR lists.
+// rankings.json list name -> [feed position, scoring]. K/DST don't change
+// with reception scoring; FLEX has separate Half and Full PPR lists. No QB
+// list: Boone doesn't do superflex rankings, so QB calls are made by hand.
 const LISTS = {
   FLEX_HALF: ['FLX', 'HALF'],
   FLEX_PPR: ['FLX', 'PPR'],
-  QB: ['QB', 'HALF'],
   K: ['K', 'HALF'],
   DEF: ['DST', 'HALF'],
 };

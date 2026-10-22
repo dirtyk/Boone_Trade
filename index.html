@@ -323,9 +323,9 @@
       <ul class="ss-list" id="ss-bench"></ul>
     </section>
     <div class="hint" style="text-align:center">
-      Boone's weekly Half/Full-PPR FLEX, QB, K and D/ST rankings, checked hourly.
-      Single-position slots fill first with the best-ranked player there, then flex slots
-      with the best-ranked eligible player left.
+      Boone's weekly Half/Full-PPR FLEX, K and D/ST rankings, checked hourly. QB and
+      superflex spots stay as you set them in Sleeper. Other single-position slots fill first
+      with the best-ranked player there, then flex slots with the best-ranked eligible player left.
     </div>
   </div>
 
@@ -1232,9 +1232,9 @@
   };
   // Never recommended to start, even if Boone's list still has them.
   const SS_UNAVAILABLE = new Set(['Out', 'IR', 'PUP', 'Sus', 'NA', 'DNR', 'COV']);
-  // Boone's QB list isn't on the FLEX list's scale; for SUPER_FLEX, QB #n
-  // competes as if he were FLEX #(n * this).
-  const SF_QB_MULT = 2;
+  // Boone doesn't do superflex rankings, so QB decisions are left to you:
+  // these slots keep whoever Sleeper has there, and QBs are never moved.
+  const SS_YOURS = new Set(['QB', 'SUPER_FLEX']);
   const ss = { leagues: null, state: null };
   const ssStatus = (msg, err) => { const el = $('#ss-status'); el.textContent = msg; el.classList.toggle('err', !!err); };
 
@@ -1282,7 +1282,7 @@
 
   function ssBuild(league, roster, pmap, rk, ppr) {
     const ranks = new Map();
-    const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], QB: rk.lists.QB, K: rk.lists.K, DEF: rk.lists.DEF };
+    const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], K: rk.lists.K, DEF: rk.lists.DEF };
     for (const [list, rows] of Object.entries(lists)) for (const r of rows || []) if (r.id) ranks.set(r.id, { list, ...r });
 
     const info = (id) => {
@@ -1302,20 +1302,24 @@
     const inactive = new Set([...(roster.reserve || []), ...(roster.taxi || [])]);
     const pool = (roster.players || []).filter((id) => !inactive.has(id)).map(info);
     const healthy = (p) => !SS_UNAVAILABLE.has(p.inj);
-    const key = (p, slot) => {
-      if (!p.rank || !healthy(p)) return null;
-      return slot === 'SUPER_FLEX' && p.list === 'QB' ? p.rank * SF_QB_MULT : p.rank;
-    };
+    const key = (p) => (p.rank && healthy(p) ? p.rank : null);
 
-    // Single-position slots first, then flex slots from most to least restrictive.
+    // Your QB/superflex picks are locked in first; then single-position slots,
+    // then flex slots from most to least restrictive.
     const order = slots.map((slot, i) => ({ slot, i, elig: SS_ELIG[slot] || [slot] }))
-      .sort((a, b) => a.elig.length - b.elig.length || a.i - b.i);
+      .sort((a, b) => SS_YOURS.has(b.slot) - SS_YOURS.has(a.slot) || a.elig.length - b.elig.length || a.i - b.i);
     const used = new Set();
     const picks = new Array(slots.length).fill(null);
     for (const { slot, i, elig } of order) {
+      if (SS_YOURS.has(slot)) {
+        const mine = info(current[i]);
+        if (mine) used.add(mine.id);
+        picks[i] = mine && { ...mine, yours: true };
+        continue;
+      }
       const cands = pool.filter((p) => !used.has(p.id) && elig.includes(p.pos));
       let best = null, bestKey = Infinity;
-      for (const c of cands) { const k = key(c, slot); if (k != null && k < bestKey) { best = c; bestKey = k; } }
+      for (const c of cands) { const k = key(c); if (k != null && k < bestKey) { best = c; bestKey = k; } }
       // Nobody ranked (bye, injuries, IDP slot): keep Sleeper's pick, else any healthy body.
       if (!best) best = cands.find((c) => c.id === current[i]) || cands.find(healthy) || null;
       if (best) used.add(best.id);
@@ -1345,7 +1349,7 @@
     };
   }
 
-  const ssRank = (p) => (p && p.rank ? `${p.list} #${p.rank}` : '—');
+  const ssRank = (p) => (p && p.yours ? 'your call' : p && p.rank ? `${p.list} #${p.rank}` : '—');
   const ssInj = (p) => (p && p.inj ? `<span class="inj${SS_UNAVAILABLE.has(p.inj) || p.inj === 'Doubtful' ? '' : ' q'}">${esc(INJ_ABBR[p.inj] || p.inj)}</span>` : '');
   const ssPos = (pos) => `<span class="pos ${['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(pos) ? pos : 'X'}">${esc(pos)}</span>`;
   const ssSub = (p) => [p.team, p.opp].filter(Boolean).map(esc).join(' · ');
