@@ -1,12 +1,12 @@
 {
   "season": 2026,
-  "week": 7,
-  "updated": "2026-10-21T15:00:33.000Z",
+  "week": 8,
+  "updated": "2026-10-28T21:13:24.000Z",
   "sources": {
-    "RB": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-running-back-breakdown-for-week-7-150033672.html",
-    "WR": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-wide-receiver-breakdown-for-week-7-150030573.html",
-    "QB": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-quarterback-breakdown-for-week-7-150025496.html",
-    "TE": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-tight-end-breakdown-for-week-7-150018094.html"
+    "QB": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-quarterback-breakdown-for-week-8-154235381.html",
+    "RB": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-running-back-breakdown-for-week-8-154046064.html",
+    "WR": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-wide-receiver-breakdown-for-week-8-153953875.html",
+    "TE": "https://sports.yahoo.com/fantasy/article/2026-trade-value-charts--justin-boones-fantasy-football-tight-end-breakdown-for-week-8-153628570.html"
   },
   "players": [
     {
@@ -15,17 +15,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 38,
-      "qb2": 95
-    },
-    {
-      "name": "Brock Purdy",
-      "key": "brock purdy",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 26,
-      "qb2": 81
+      "qb1": 39,
+      "qb2": 97
     },
     {
       "name": "Drake Maye",
@@ -33,17 +24,17 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 24,
-      "qb2": 78
+      "qb1": 29,
+      "qb2": 84
     },
     {
-      "name": "Patrick Mahomes II",
-      "key": "patrick mahomes",
+      "name": "Brock Purdy",
+      "key": "brock purdy",
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 20,
-      "qb2": 67
+      "qb1": 25,
+      "qb2": 79
     },
     {
       "name": "Lamar Jackson",
@@ -51,8 +42,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 19,
-      "qb2": 66
+      "qb1": 23,
+      "qb2": 71
     },
     {
       "name": "Joe Burrow",
@@ -60,8 +51,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 18,
-      "qb2": 65
+      "qb1": 20,
+      "qb2": 68
     },
     {
       "name": "Trevor Lawrence",
@@ -69,8 +60,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 17,
-      "qb2": 64
+      "qb1": 19,
+      "qb2": 66
     },
     {
       "name": "Caleb Williams",
@@ -78,8 +69,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 16,
-      "qb2": 63
+      "qb1": 18,
+      "qb2": 65
     },
     {
       "name": "Jayden Daniels",
@@ -87,12 +78,48 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 15,
-      "qb2": 61
+      "qb1": 17,
+      "qb2": 64
     },
     {
       "name": "Jared Goff",
       "key": "jared goff",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 16,
+      "qb2": 62
+    },
+    {
+      "name": "C.J. Stroud",
+      "key": "cj stroud",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 14,
+      "qb2": 56
+    },
+    {
+      "name": "Jordan Love",
+      "key": "jordan love",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 13,
+      "qb2": 55
+    },
+    {
+      "name": "Dak Prescott",
+      "key": "dak prescott",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 13,
+      "qb2": 55
+    },
+    {
+      "name": "Tyler Shough",
+      "key": "tyler shough",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -105,43 +132,16 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 12,
-      "qb2": 54
+      "qb1": 11,
+      "qb2": 51
     },
     {
-      "name": "Tyler Shough",
-      "key": "tyler shough",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 12,
-      "qb2": 54
-    },
-    {
-      "name": "C.J. Stroud",
-      "key": "cj stroud",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 12,
-      "qb2": 54
-    },
-    {
-      "name": "Dak Prescott",
-      "key": "dak prescott",
+      "name": "Patrick Mahomes II",
+      "key": "patrick mahomes",
       "pos": "QB",
       "half": null,
       "ppr": null,
       "qb1": 10,
-      "qb2": 51
-    },
-    {
-      "name": "Jordan Love",
-      "key": "jordan love",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 9,
       "qb2": 49
     },
     {
@@ -150,8 +150,17 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 6,
+      "qb1": 7,
       "qb2": 45
+    },
+    {
+      "name": "Malik Willis",
+      "key": "malik willis",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 5,
+      "qb2": 41
     },
     {
       "name": "Kyler Murray",
@@ -159,26 +168,8 @@
       "pos": "QB",
       "half": null,
       "ppr": null,
-      "qb1": 5,
-      "qb2": 43
-    },
-    {
-      "name": "Kirk Cousins",
-      "key": "kirk cousins",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 2,
-      "qb2": 35
-    },
-    {
-      "name": "Aaron Rodgers",
-      "key": "aaron rodgers",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 1,
-      "qb2": 29
+      "qb1": 3,
+      "qb2": 38
     },
     {
       "name": "Bo Nix",
@@ -187,11 +178,20 @@
       "half": null,
       "ppr": null,
       "qb1": 1,
+      "qb2": 29
+    },
+    {
+      "name": "Aaron Rodgers",
+      "key": "aaron rodgers",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 1,
       "qb2": 28
     },
     {
-      "name": "Baker Mayfield",
-      "key": "baker mayfield",
+      "name": "Kirk Cousins",
+      "key": "kirk cousins",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -208,8 +208,8 @@
       "qb2": 26
     },
     {
-      "name": "Deshaun Watson",
-      "key": "deshaun watson",
+      "name": "Baker Mayfield",
+      "key": "baker mayfield",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -226,6 +226,15 @@
       "qb2": 24
     },
     {
+      "name": "Deshaun Watson",
+      "key": "deshaun watson",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 0,
+      "qb2": 24
+    },
+    {
       "name": "Justin Herbert",
       "key": "justin herbert",
       "pos": "QB",
@@ -235,17 +244,26 @@
       "qb2": 23
     },
     {
+      "name": "Geno Smith",
+      "key": "geno smith",
+      "pos": "QB",
+      "half": null,
+      "ppr": null,
+      "qb1": 0,
+      "qb2": 20
+    },
+    {
       "name": "Jacoby Brissett",
       "key": "jacoby brissett",
       "pos": "QB",
       "half": null,
       "ppr": null,
       "qb1": 0,
-      "qb2": 22
+      "qb2": 20
     },
     {
-      "name": "Tanner McKee",
-      "key": "tanner mckee",
+      "name": "J.J. McCarthy",
+      "key": "jj mccarthy",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -253,17 +271,8 @@
       "qb2": 20
     },
     {
-      "name": "Malik Willis",
-      "key": "malik willis",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 0,
-      "qb2": 20
-    },
-    {
-      "name": "Geno Smith",
-      "key": "geno smith",
+      "name": "Fernando Mendoza",
+      "key": "fernando mendoza",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -280,15 +289,6 @@
       "qb2": 18
     },
     {
-      "name": "J.J. McCarthy",
-      "key": "jj mccarthy",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 0,
-      "qb2": 16
-    },
-    {
       "name": "Cam Ward",
       "key": "cam ward",
       "pos": "QB",
@@ -298,17 +298,8 @@
       "qb2": 16
     },
     {
-      "name": "Fernando Mendoza",
-      "key": "fernando mendoza",
-      "pos": "QB",
-      "half": null,
-      "ppr": null,
-      "qb1": 0,
-      "qb2": 15
-    },
-    {
-      "name": "Jameis Winston",
-      "key": "jameis winston",
+      "name": "Tanner McKee",
+      "key": "tanner mckee",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -322,20 +313,20 @@
       "half": null,
       "ppr": null,
       "qb1": 0,
-      "qb2": 12
+      "qb2": 9
     },
     {
-      "name": "Tyler Huntley",
-      "key": "tyler huntley",
+      "name": "Jameis Winston",
+      "key": "jameis winston",
       "pos": "QB",
       "half": null,
       "ppr": null,
       "qb1": 0,
-      "qb2": 7
+      "qb2": 6
     },
     {
-      "name": "Jalon Daniels",
-      "key": "jalon daniels",
+      "name": "Tyler Huntley",
+      "key": "tyler huntley",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -370,17 +361,17 @@
       "qb2": 3
     },
     {
-      "name": "Cole Payton",
-      "key": "cole payton",
+      "name": "Riley Leonard",
+      "key": "riley leonard",
       "pos": "QB",
       "half": null,
       "ppr": null,
       "qb1": 0,
-      "qb2": 2
+      "qb2": 3
     },
     {
-      "name": "Tua Tagovailoa",
-      "key": "tua tagovailoa",
+      "name": "Shedeur Sanders",
+      "key": "shedeur sanders",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -388,8 +379,8 @@
       "qb2": 1
     },
     {
-      "name": "Shedeur Sanders",
-      "key": "shedeur sanders",
+      "name": "Jalon Daniels",
+      "key": "jalon daniels",
       "pos": "QB",
       "half": null,
       "ppr": null,
@@ -433,11 +424,20 @@
       "qb2": null
     },
     {
+      "name": "James Cook III",
+      "key": "james cook",
+      "pos": "RB",
+      "half": 73,
+      "ppr": 75,
+      "qb1": null,
+      "qb2": null
+    },
+    {
       "name": "Jonathan Taylor",
       "key": "jonathan taylor",
       "pos": "RB",
-      "half": 74,
-      "ppr": 76,
+      "half": 70,
+      "ppr": 72,
       "qb1": null,
       "qb2": null
     },
@@ -445,16 +445,7 @@
       "name": "Christian McCaffrey",
       "key": "christian mccaffrey",
       "pos": "RB",
-      "half": 72,
-      "ppr": 75,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "James Cook III",
-      "key": "james cook",
-      "pos": "RB",
-      "half": 70,
+      "half": 69,
       "ppr": 72,
       "qb1": null,
       "qb2": null
@@ -463,8 +454,8 @@
       "name": "Derrick Henry",
       "key": "derrick henry",
       "pos": "RB",
-      "half": 68,
-      "ppr": 70,
+      "half": 64,
+      "ppr": 66,
       "qb1": null,
       "qb2": null
     },
@@ -478,29 +469,20 @@
       "qb2": null
     },
     {
-      "name": "Chuba Hubbard",
-      "key": "chuba hubbard",
-      "pos": "RB",
-      "half": 61,
-      "ppr": 64,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Jaylen Warren",
       "key": "jaylen warren",
       "pos": "RB",
-      "half": 54,
-      "ppr": 57,
+      "half": 61,
+      "ppr": 63,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "D'Andre Swift",
-      "key": "dandre swift",
+      "name": "Chuba Hubbard",
+      "key": "chuba hubbard",
       "pos": "RB",
-      "half": 54,
-      "ppr": 56,
+      "half": 58,
+      "ppr": 60,
       "qb1": null,
       "qb2": null
     },
@@ -508,53 +490,17 @@
       "name": "Javonte Williams",
       "key": "javonte williams",
       "pos": "RB",
-      "half": 52,
-      "ppr": 54,
+      "half": 57,
+      "ppr": 59,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Chase Brown",
-      "key": "chase brown",
+      "name": "D'Andre Swift",
+      "key": "dandre swift",
       "pos": "RB",
-      "half": 51,
-      "ppr": 53,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Bhayshul Tuten",
-      "key": "bhayshul tuten",
-      "pos": "RB",
-      "half": 50,
-      "ppr": 52,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Josh Jacobs",
-      "key": "josh jacobs",
-      "pos": "RB",
-      "half": 44,
-      "ppr": 46,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Ashton Jeanty",
-      "key": "ashton jeanty",
-      "pos": "RB",
-      "half": 43,
-      "ppr": 45,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Saquon Barkley",
-      "key": "saquon barkley",
-      "pos": "RB",
-      "half": 40,
-      "ppr": 42,
+      "half": 55,
+      "ppr": 57,
       "qb1": null,
       "qb2": null
     },
@@ -562,26 +508,35 @@
       "name": "Bucky Irving",
       "key": "bucky irving",
       "pos": "RB",
-      "half": 39,
-      "ppr": 41,
+      "half": 54,
+      "ppr": 56,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Breece Hall",
-      "key": "breece hall",
+      "name": "Josh Jacobs",
+      "key": "josh jacobs",
       "pos": "RB",
-      "half": 39,
-      "ppr": 41,
+      "half": 53,
+      "ppr": 55,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Jeremiyah Love",
-      "key": "jeremiyah love",
+      "name": "Bhayshul Tuten",
+      "key": "bhayshul tuten",
       "pos": "RB",
-      "half": 35,
-      "ppr": 37,
+      "half": 52,
+      "ppr": 54,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Ashton Jeanty",
+      "key": "ashton jeanty",
+      "pos": "RB",
+      "half": 47,
+      "ppr": 50,
       "qb1": null,
       "qb2": null
     },
@@ -589,8 +544,44 @@
       "name": "Ollie Gordon II",
       "key": "ollie gordon",
       "pos": "RB",
-      "half": 29,
-      "ppr": 31,
+      "half": 47,
+      "ppr": 49,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Saquon Barkley",
+      "key": "saquon barkley",
+      "pos": "RB",
+      "half": 41,
+      "ppr": 43,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Chase Brown",
+      "key": "chase brown",
+      "pos": "RB",
+      "half": 40,
+      "ppr": 42,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Breece Hall",
+      "key": "breece hall",
+      "pos": "RB",
+      "half": 40,
+      "ppr": 42,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Jeremiyah Love",
+      "key": "jeremiyah love",
+      "pos": "RB",
+      "half": 39,
+      "ppr": 41,
       "qb1": null,
       "qb2": null
     },
@@ -598,8 +589,8 @@
       "name": "Quinshon Judkins",
       "key": "quinshon judkins",
       "pos": "RB",
-      "half": 28,
-      "ppr": 30,
+      "half": 34,
+      "ppr": 36,
       "qb1": null,
       "qb2": null
     },
@@ -607,44 +598,8 @@
       "name": "Jordan Mason",
       "key": "jordan mason",
       "pos": "RB",
-      "half": 26,
-      "ppr": 28,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Aaron Jones Sr.",
-      "key": "aaron jones",
-      "pos": "RB",
-      "half": 25,
-      "ppr": 27,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Rachaad White",
-      "key": "rachaad white",
-      "pos": "RB",
-      "half": 22,
-      "ppr": 24,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Zach Charbonnet",
-      "key": "zach charbonnet",
-      "pos": "RB",
-      "half": 21,
-      "ppr": 23,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Rhamondre Stevenson",
-      "key": "rhamondre stevenson",
-      "pos": "RB",
-      "half": 20,
-      "ppr": 22,
+      "half": 31,
+      "ppr": 32,
       "qb1": null,
       "qb2": null
     },
@@ -652,53 +607,8 @@
       "name": "Blake Corum",
       "key": "blake corum",
       "pos": "RB",
-      "half": 18,
-      "ppr": 20,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Braelon Allen",
-      "key": "braelon allen",
-      "pos": "RB",
-      "half": 17,
-      "ppr": 19,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "J.K. Dobbins",
-      "key": "jk dobbins",
-      "pos": "RB",
-      "half": 17,
-      "ppr": 19,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "RJ Harvey",
-      "key": "rj harvey",
-      "pos": "RB",
-      "half": 16,
-      "ppr": 19,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Cam Skattebo",
-      "key": "cam skattebo",
-      "pos": "RB",
-      "half": 16,
-      "ppr": 18,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Omarion Hampton",
-      "key": "omarion hampton",
-      "pos": "RB",
-      "half": 16,
-      "ppr": 18,
+      "half": 30,
+      "ppr": 32,
       "qb1": null,
       "qb2": null
     },
@@ -706,8 +616,35 @@
       "name": "Tony Pollard",
       "key": "tony pollard",
       "pos": "RB",
-      "half": 16,
-      "ppr": 18,
+      "half": 29,
+      "ppr": 31,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Cam Skattebo",
+      "key": "cam skattebo",
+      "pos": "RB",
+      "half": 29,
+      "ppr": 31,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Rhamondre Stevenson",
+      "key": "rhamondre stevenson",
+      "pos": "RB",
+      "half": 28,
+      "ppr": 30,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Jonah Coleman",
+      "key": "jonah coleman",
+      "pos": "RB",
+      "half": 28,
+      "ppr": 30,
       "qb1": null,
       "qb2": null
     },
@@ -715,8 +652,80 @@
       "name": "Travis Etienne Jr.",
       "key": "travis etienne",
       "pos": "RB",
-      "half": 16,
-      "ppr": 18,
+      "half": 24,
+      "ppr": 26,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Zach Charbonnet",
+      "key": "zach charbonnet",
+      "pos": "RB",
+      "half": 23,
+      "ppr": 25,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Rachaad White",
+      "key": "rachaad white",
+      "pos": "RB",
+      "half": 23,
+      "ppr": 25,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Omarion Hampton",
+      "key": "omarion hampton",
+      "pos": "RB",
+      "half": 20,
+      "ppr": 22,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Braelon Allen",
+      "key": "braelon allen",
+      "pos": "RB",
+      "half": 19,
+      "ppr": 21,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Aaron Jones Sr.",
+      "key": "aaron jones",
+      "pos": "RB",
+      "half": 18,
+      "ppr": 20,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Jadarian Price",
+      "key": "jadarian price",
+      "pos": "RB",
+      "half": 18,
+      "ppr": 20,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Kaelon Black",
+      "key": "kaelon black",
+      "pos": "RB",
+      "half": 18,
+      "ppr": 20,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "RJ Harvey",
+      "key": "rj harvey",
+      "pos": "RB",
+      "half": 17,
+      "ppr": 19,
       "qb1": null,
       "qb2": null
     },
@@ -724,7 +733,16 @@
       "name": "Woody Marks",
       "key": "woody marks",
       "pos": "RB",
-      "half": 16,
+      "half": 17,
+      "ppr": 18,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Rico Dowdle",
+      "key": "rico dowdle",
+      "pos": "RB",
+      "half": 17,
       "ppr": 18,
       "qb1": null,
       "qb2": null
@@ -733,8 +751,17 @@
       "name": "Kyle Monangai",
       "key": "kyle monangai",
       "pos": "RB",
-      "half": 16,
-      "ppr": 17,
+      "half": 17,
+      "ppr": 18,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "David Montgomery",
+      "key": "david montgomery",
+      "pos": "RB",
+      "half": 17,
+      "ppr": 18,
       "qb1": null,
       "qb2": null
     },
@@ -748,38 +775,56 @@
       "qb2": null
     },
     {
-      "name": "Kendre Miller",
-      "key": "kendre miller",
-      "pos": "RB",
-      "half": 14,
-      "ppr": 16,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tyrone Tracy Jr.",
-      "key": "tyrone tracy",
-      "pos": "RB",
-      "half": 13,
-      "ppr": 15,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jadarian Price",
-      "key": "jadarian price",
-      "pos": "RB",
-      "half": 13,
-      "ppr": 15,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Alvin Kamara",
       "key": "alvin kamara",
       "pos": "RB",
-      "half": 12,
+      "half": 14,
+      "ppr": 15,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Emmett Johnson",
+      "key": "emmett johnson",
+      "pos": "RB",
+      "half": 14,
+      "ppr": 15,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "J.K. Dobbins",
+      "key": "jk dobbins",
+      "pos": "RB",
+      "half": 13,
       "ppr": 14,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Brian Robinson Jr.",
+      "key": "brian robinson",
+      "pos": "RB",
+      "half": 13,
+      "ppr": 14,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "TreVeyon Henderson",
+      "key": "treveyon henderson",
+      "pos": "RB",
+      "half": 13,
+      "ppr": 14,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Emanuel Wilson",
+      "key": "emanuel wilson",
+      "pos": "RB",
+      "half": 12,
+      "ppr": 13,
       "qb1": null,
       "qb2": null
     },
@@ -793,65 +838,29 @@
       "qb2": null
     },
     {
-      "name": "David Montgomery",
-      "key": "david montgomery",
+      "name": "Tyrone Tracy Jr.",
+      "key": "tyrone tracy",
       "pos": "RB",
-      "half": 12,
-      "ppr": 13,
+      "half": 11,
+      "ppr": 12,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Brian Robinson Jr.",
-      "key": "brian robinson",
+      "name": "Seth McGowan",
+      "key": "seth mcgowan",
       "pos": "RB",
-      "half": 12,
-      "ppr": 13,
+      "half": 11,
+      "ppr": 12,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Rico Dowdle",
-      "key": "rico dowdle",
+      "name": "Kenny Gainwell",
+      "key": "kenny gainwell",
       "pos": "RB",
-      "half": 12,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Kaelon Black",
-      "key": "kaelon black",
-      "pos": "RB",
-      "half": 12,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Emmett Johnson",
-      "key": "emmett johnson",
-      "pos": "RB",
-      "half": 12,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "TreVeyon Henderson",
-      "key": "treveyon henderson",
-      "pos": "RB",
-      "half": 12,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tyler Allgeier",
-      "key": "tyler allgeier",
-      "pos": "RB",
-      "half": 12,
-      "ppr": 13,
+      "half": 11,
+      "ppr": 12,
       "qb1": null,
       "qb2": null
     },
@@ -859,17 +868,17 @@
       "name": "Chris Rodriguez Jr.",
       "key": "chris rodriguez",
       "pos": "RB",
-      "half": 12,
-      "ppr": 13,
+      "half": 11,
+      "ppr": 12,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Jonah Coleman",
-      "key": "jonah coleman",
+      "name": "Jonathon Brooks",
+      "key": "jonathon brooks",
       "pos": "RB",
-      "half": 11,
-      "ppr": 12,
+      "half": 10,
+      "ppr": 11,
       "qb1": null,
       "qb2": null
     },
@@ -883,29 +892,11 @@
       "qb2": null
     },
     {
-      "name": "Emanuel Wilson",
-      "key": "emanuel wilson",
-      "pos": "RB",
-      "half": 9,
-      "ppr": 10,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Tyjae Spears",
       "key": "tyjae spears",
       "pos": "RB",
-      "half": 9,
-      "ppr": 10,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jonathon Brooks",
-      "key": "jonathon brooks",
-      "pos": "RB",
-      "half": 9,
-      "ppr": 10,
+      "half": 10,
+      "ppr": 11,
       "qb1": null,
       "qb2": null
     },
@@ -913,23 +904,23 @@
       "name": "Dameon Pierce",
       "key": "dameon pierce",
       "pos": "RB",
-      "half": 9,
-      "ppr": 10,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Kenny Gainwell",
-      "key": "kenny gainwell",
-      "pos": "RB",
-      "half": 8,
-      "ppr": 9,
+      "half": 10,
+      "ppr": 11,
       "qb1": null,
       "qb2": null
     },
     {
       "name": "MarShawn Lloyd",
       "key": "marshawn lloyd",
+      "pos": "RB",
+      "half": 9,
+      "ppr": 10,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Dylan Sampson",
+      "key": "dylan sampson",
       "pos": "RB",
       "half": 8,
       "ppr": 9,
@@ -946,11 +937,38 @@
       "qb2": null
     },
     {
-      "name": "Dylan Sampson",
-      "key": "dylan sampson",
+      "name": "Bam Knight",
+      "key": "bam knight",
       "pos": "RB",
       "half": 8,
       "ppr": 9,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Ray Davis",
+      "key": "ray davis",
+      "pos": "RB",
+      "half": 8,
+      "ppr": 9,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tank Bigsby",
+      "key": "tank bigsby",
+      "pos": "RB",
+      "half": 8,
+      "ppr": 9,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "James Conner",
+      "key": "james conner",
+      "pos": "RB",
+      "half": 7,
+      "ppr": 8,
       "qb1": null,
       "qb2": null
     },
@@ -964,8 +982,8 @@
       "qb2": null
     },
     {
-      "name": "Corey Kiner",
-      "key": "corey kiner",
+      "name": "Devin Singletary",
+      "key": "devin singletary",
       "pos": "RB",
       "half": 7,
       "ppr": 8,
@@ -973,17 +991,17 @@
       "qb2": null
     },
     {
-      "name": "Bam Knight",
-      "key": "bam knight",
+      "name": "Tyler Allgeier",
+      "key": "tyler allgeier",
       "pos": "RB",
-      "half": 7,
-      "ppr": 8,
+      "half": 6,
+      "ppr": 7,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "James Conner",
-      "key": "james conner",
+      "name": "Tyler Goodson",
+      "key": "tyler goodson",
       "pos": "RB",
       "half": 6,
       "ppr": 7,
@@ -1000,17 +1018,8 @@
       "qb2": null
     },
     {
-      "name": "Nicholas Singleton",
-      "key": "nicholas singleton",
-      "pos": "RB",
-      "half": 6,
-      "ppr": 7,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Ray Davis",
-      "key": "ray davis",
+      "name": "Kendre Miller",
+      "key": "kendre miller",
       "pos": "RB",
       "half": 5,
       "ppr": 6,
@@ -1018,8 +1027,8 @@
       "qb2": null
     },
     {
-      "name": "Tank Bigsby",
-      "key": "tank bigsby",
+      "name": "Sione Vaki",
+      "key": "sione vaki",
       "pos": "RB",
       "half": 5,
       "ppr": 6,
@@ -1027,8 +1036,8 @@
       "qb2": null
     },
     {
-      "name": "Jaleel McLaughlin",
-      "key": "jaleel mclaughlin",
+      "name": "Ty Johnson",
+      "key": "ty johnson",
       "pos": "RB",
       "half": 5,
       "ppr": 6,
@@ -1045,24 +1054,6 @@
       "qb2": null
     },
     {
-      "name": "Seth McGowan",
-      "key": "seth mcgowan",
-      "pos": "RB",
-      "half": 5,
-      "ppr": 6,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tyler Goodson",
-      "key": "tyler goodson",
-      "pos": "RB",
-      "half": 4,
-      "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Sean Tucker",
       "key": "sean tucker",
       "pos": "RB",
@@ -1072,38 +1063,11 @@
       "qb2": null
     },
     {
-      "name": "Ty Johnson",
-      "key": "ty johnson",
+      "name": "Nicholas Singleton",
+      "key": "nicholas singleton",
       "pos": "RB",
       "half": 4,
       "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jawhar Jordan",
-      "key": "jawhar jordan",
-      "pos": "RB",
-      "half": 4,
-      "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Devin Singletary",
-      "key": "devin singletary",
-      "pos": "RB",
-      "half": 4,
-      "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Austin Ekeler",
-      "key": "austin ekeler",
-      "pos": "RB",
-      "half": 3,
-      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1111,8 +1075,8 @@
       "name": "Jaylen Wright",
       "key": "jaylen wright",
       "pos": "RB",
-      "half": 2,
-      "ppr": 3,
+      "half": 4,
+      "ppr": 5,
       "qb1": null,
       "qb2": null
     },
@@ -1120,26 +1084,8 @@
       "name": "George Holani",
       "key": "george holani",
       "pos": "RB",
-      "half": 2,
-      "ppr": 3,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Audric Estime",
-      "key": "audric estime",
-      "pos": "RB",
-      "half": 2,
-      "ppr": 3,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Sione Vaki",
-      "key": "sione vaki",
-      "pos": "RB",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1147,8 +1093,8 @@
       "name": "Demond Claiborne",
       "key": "demond claiborne",
       "pos": "RB",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1156,8 +1102,8 @@
       "name": "Kaytron Allen",
       "key": "kaytron allen",
       "pos": "RB",
-      "half": 1,
-      "ppr": 1,
+      "half": 2,
+      "ppr": 3,
       "qb1": null,
       "qb2": null
     },
@@ -1165,8 +1111,26 @@
       "name": "Jeremy McNichols",
       "key": "jeremy mcnichols",
       "pos": "RB",
+      "half": 2,
+      "ppr": 3,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Austin Ekeler",
+      "key": "austin ekeler",
+      "pos": "RB",
+      "half": 2,
+      "ppr": 3,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Will Shipley",
+      "key": "will shipley",
+      "pos": "RB",
       "half": 1,
-      "ppr": 1,
+      "ppr": 2,
       "qb1": null,
       "qb2": null
     },
@@ -1180,11 +1144,11 @@
       "qb2": null
     },
     {
-      "name": "Pierre Strong Jr.",
-      "key": "pierre strong",
+      "name": "Corey Kiner",
+      "key": "corey kiner",
       "pos": "RB",
-      "half": 0,
-      "ppr": 0,
+      "half": 1,
+      "ppr": 1,
       "qb1": null,
       "qb2": null
     },
@@ -1192,17 +1156,35 @@
       "name": "Isaiah Davis",
       "key": "isaiah davis",
       "pos": "RB",
+      "half": 1,
+      "ppr": 1,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Jaleel McLaughlin",
+      "key": "jaleel mclaughlin",
+      "pos": "RB",
       "half": 0,
       "ppr": 0,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Puka Nacua",
-      "key": "puka nacua",
-      "pos": "WR",
-      "half": 87,
-      "ppr": 90,
+      "name": "Khalil Herbert",
+      "key": "khalil herbert",
+      "pos": "RB",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Trevor Etienne",
+      "key": "trevor etienne",
+      "pos": "RB",
+      "half": 0,
+      "ppr": 0,
       "qb1": null,
       "qb2": null
     },
@@ -1210,8 +1192,8 @@
       "name": "Jaxon Smith-Njigba",
       "key": "jaxon smith njigba",
       "pos": "WR",
-      "half": 83,
-      "ppr": 86,
+      "half": 93,
+      "ppr": 96,
       "qb1": null,
       "qb2": null
     },
@@ -1219,8 +1201,8 @@
       "name": "Ja'Marr Chase",
       "key": "jamarr chase",
       "pos": "WR",
-      "half": 81,
-      "ppr": 84,
+      "half": 83,
+      "ppr": 86,
       "qb1": null,
       "qb2": null
     },
@@ -1228,8 +1210,17 @@
       "name": "Amon-Ra St. Brown",
       "key": "amon ra st brown",
       "pos": "WR",
-      "half": 74,
-      "ppr": 77,
+      "half": 82,
+      "ppr": 85,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Puka Nacua",
+      "key": "puka nacua",
+      "pos": "WR",
+      "half": 79,
+      "ppr": 82,
       "qb1": null,
       "qb2": null
     },
@@ -1237,8 +1228,8 @@
       "name": "CeeDee Lamb",
       "key": "ceedee lamb",
       "pos": "WR",
-      "half": 68,
-      "ppr": 71,
+      "half": 73,
+      "ppr": 76,
       "qb1": null,
       "qb2": null
     },
@@ -1246,35 +1237,8 @@
       "name": "Malik Nabers",
       "key": "malik nabers",
       "pos": "WR",
-      "half": 67,
-      "ppr": 70,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Justin Jefferson",
-      "key": "justin jefferson",
-      "pos": "WR",
-      "half": 64,
-      "ppr": 67,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Drake London",
-      "key": "drake london",
-      "pos": "WR",
-      "half": 63,
-      "ppr": 66,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Chris Olave",
-      "key": "chris olave",
-      "pos": "WR",
-      "half": 62,
-      "ppr": 65,
+      "half": 71,
+      "ppr": 74,
       "qb1": null,
       "qb2": null
     },
@@ -1282,17 +1246,17 @@
       "name": "Zay Flowers",
       "key": "zay flowers",
       "pos": "WR",
-      "half": 61,
-      "ppr": 64,
+      "half": 67,
+      "ppr": 70,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Nico Collins",
-      "key": "nico collins",
+      "name": "Drake London",
+      "key": "drake london",
       "pos": "WR",
-      "half": 59,
-      "ppr": 62,
+      "half": 65,
+      "ppr": 68,
       "qb1": null,
       "qb2": null
     },
@@ -1300,8 +1264,26 @@
       "name": "Christian Watson",
       "key": "christian watson",
       "pos": "WR",
-      "half": 58,
-      "ppr": 61,
+      "half": 64,
+      "ppr": 67,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Chris Olave",
+      "key": "chris olave",
+      "pos": "WR",
+      "half": 64,
+      "ppr": 67,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Justin Jefferson",
+      "key": "justin jefferson",
+      "pos": "WR",
+      "half": 59,
+      "ppr": 62,
       "qb1": null,
       "qb2": null
     },
@@ -1309,8 +1291,8 @@
       "name": "Parker Washington",
       "key": "parker washington",
       "pos": "WR",
-      "half": 57,
-      "ppr": 60,
+      "half": 58,
+      "ppr": 61,
       "qb1": null,
       "qb2": null
     },
@@ -1318,17 +1300,26 @@
       "name": "Matthew Golden",
       "key": "matthew golden",
       "pos": "WR",
+      "half": 57,
+      "ppr": 60,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Nico Collins",
+      "key": "nico collins",
+      "pos": "WR",
       "half": 52,
       "ppr": 55,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Garrett Wilson",
-      "key": "garrett wilson",
+      "name": "Tee Higgins",
+      "key": "tee higgins",
       "pos": "WR",
-      "half": 49,
-      "ppr": 52,
+      "half": 52,
+      "ppr": 55,
       "qb1": null,
       "qb2": null
     },
@@ -1345,35 +1336,8 @@
       "name": "George Pickens",
       "key": "george pickens",
       "pos": "WR",
-      "half": 44,
-      "ppr": 47,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jalen Coker",
-      "key": "jalen coker",
-      "pos": "WR",
-      "half": 42,
-      "ppr": 45,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "DeVonta Smith",
-      "key": "devonta smith",
-      "pos": "WR",
-      "half": 38,
-      "ppr": 41,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tee Higgins",
-      "key": "tee higgins",
-      "pos": "WR",
-      "half": 37,
-      "ppr": 40,
+      "half": 45,
+      "ppr": 48,
       "qb1": null,
       "qb2": null
     },
@@ -1381,8 +1345,26 @@
       "name": "Luther Burden III",
       "key": "luther burden",
       "pos": "WR",
-      "half": 35,
-      "ppr": 38,
+      "half": 45,
+      "ppr": 48,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Jalen Coker",
+      "key": "jalen coker",
+      "pos": "WR",
+      "half": 38,
+      "ppr": 41,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Garrett Wilson",
+      "key": "garrett wilson",
+      "pos": "WR",
+      "half": 38,
+      "ppr": 41,
       "qb1": null,
       "qb2": null
     },
@@ -1390,26 +1372,8 @@
       "name": "DJ Moore",
       "key": "dj moore",
       "pos": "WR",
-      "half": 34,
-      "ppr": 37,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "DK Metcalf",
-      "key": "dk metcalf",
-      "pos": "WR",
-      "half": 34,
-      "ppr": 37,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Germie Bernard",
-      "key": "germie bernard",
-      "pos": "WR",
-      "half": 33,
-      "ppr": 36,
+      "half": 37,
+      "ppr": 40,
       "qb1": null,
       "qb2": null
     },
@@ -1417,26 +1381,26 @@
       "name": "Mike Evans",
       "key": "mike evans",
       "pos": "WR",
-      "half": 32,
-      "ppr": 35,
+      "half": 34,
+      "ppr": 37,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "A.J. Brown",
-      "key": "aj brown",
+      "name": "Omar Cooper Jr.",
+      "key": "omar cooper",
       "pos": "WR",
-      "half": 32,
-      "ppr": 35,
+      "half": 34,
+      "ppr": 37,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Michael Wilson",
-      "key": "michael wilson",
+      "name": "Jameson Williams",
+      "key": "jameson williams",
       "pos": "WR",
-      "half": 29,
-      "ppr": 32,
+      "half": 33,
+      "ppr": 36,
       "qb1": null,
       "qb2": null
     },
@@ -1444,32 +1408,41 @@
       "name": "Emeka Egbuka",
       "key": "emeka egbuka",
       "pos": "WR",
-      "half": 28,
+      "half": 32,
+      "ppr": 35,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "DeVonta Smith",
+      "key": "devonta smith",
+      "pos": "WR",
+      "half": 30,
+      "ppr": 33,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "DK Metcalf",
+      "key": "dk metcalf",
+      "pos": "WR",
+      "half": 29,
       "ppr": 31,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Carnell Tate",
-      "key": "carnell tate",
+      "name": "A.J. Brown",
+      "key": "aj brown",
       "pos": "WR",
-      "half": 28,
+      "half": 29,
       "ppr": 31,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Denzel Boston",
-      "key": "denzel boston",
-      "pos": "WR",
-      "half": 28,
-      "ppr": 30,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jameson Williams",
-      "key": "jameson williams",
+      "name": "Germie Bernard",
+      "key": "germie bernard",
       "pos": "WR",
       "half": 28,
       "ppr": 30,
@@ -1486,8 +1459,8 @@
       "qb2": null
     },
     {
-      "name": "Rashee Rice",
-      "key": "rashee rice",
+      "name": "Carnell Tate",
+      "key": "carnell tate",
       "pos": "WR",
       "half": 28,
       "ppr": 30,
@@ -1495,8 +1468,8 @@
       "qb2": null
     },
     {
-      "name": "Jordyn Tyson",
-      "key": "jordyn tyson",
+      "name": "Michael Wilson",
+      "key": "michael wilson",
       "pos": "WR",
       "half": 28,
       "ppr": 30,
@@ -1504,8 +1477,8 @@
       "qb2": null
     },
     {
-      "name": "Jaylen Waddle",
-      "key": "jaylen waddle",
+      "name": "Denzel Boston",
+      "key": "denzel boston",
       "pos": "WR",
       "half": 27,
       "ppr": 29,
@@ -1513,17 +1486,26 @@
       "qb2": null
     },
     {
-      "name": "Omar Cooper Jr.",
-      "key": "omar cooper",
+      "name": "Rashee Rice",
+      "key": "rashee rice",
       "pos": "WR",
-      "half": 26,
-      "ppr": 28,
+      "half": 27,
+      "ppr": 29,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Rome Odunze",
-      "key": "rome odunze",
+      "name": "Jordyn Tyson",
+      "key": "jordyn tyson",
+      "pos": "WR",
+      "half": 27,
+      "ppr": 29,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "KC Concepcion Jr.",
+      "key": "kc concepcion",
       "pos": "WR",
       "half": 26,
       "ppr": 28,
@@ -1534,14 +1516,32 @@
       "name": "Ladd McConkey",
       "key": "ladd mcconkey",
       "pos": "WR",
+      "half": 24,
+      "ppr": 26,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tre Tucker",
+      "key": "tre tucker",
+      "pos": "WR",
       "half": 23,
       "ppr": 25,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Xavier Worthy",
-      "key": "xavier worthy",
+      "name": "Makai Lemon",
+      "key": "makai lemon",
+      "pos": "WR",
+      "half": 23,
+      "ppr": 25,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Rome Odunze",
+      "key": "rome odunze",
       "pos": "WR",
       "half": 22,
       "ppr": 24,
@@ -1549,20 +1549,20 @@
       "qb2": null
     },
     {
-      "name": "Jordan Addison",
-      "key": "jordan addison",
+      "name": "Jaylen Waddle",
+      "key": "jaylen waddle",
       "pos": "WR",
-      "half": 18,
-      "ppr": 20,
+      "half": 22,
+      "ppr": 24,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "KC Concepcion Jr.",
-      "key": "kc concepcion",
+      "name": "Caleb Douglas",
+      "key": "caleb douglas",
       "pos": "WR",
-      "half": 16,
-      "ppr": 18,
+      "half": 21,
+      "ppr": 23,
       "qb1": null,
       "qb2": null
     },
@@ -1570,8 +1570,44 @@
       "name": "Jakobi Meyers",
       "key": "jakobi meyers",
       "pos": "WR",
-      "half": 15,
-      "ppr": 17,
+      "half": 20,
+      "ppr": 22,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Malik Washington",
+      "key": "malik washington",
+      "pos": "WR",
+      "half": 19,
+      "ppr": 21,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Antonio Williams",
+      "key": "antonio williams",
+      "pos": "WR",
+      "half": 18,
+      "ppr": 20,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Keenan Allen",
+      "key": "keenan allen",
+      "pos": "WR",
+      "half": 14,
+      "ppr": 16,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Josh Downs",
+      "key": "josh downs",
+      "pos": "WR",
+      "half": 14,
+      "ppr": 16,
       "qb1": null,
       "qb2": null
     },
@@ -1585,71 +1621,35 @@
       "qb2": null
     },
     {
+      "name": "Jordan Addison",
+      "key": "jordan addison",
+      "pos": "WR",
+      "half": 13,
+      "ppr": 15,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Xavier Worthy",
+      "key": "xavier worthy",
+      "pos": "WR",
+      "half": 13,
+      "ppr": 15,
+      "qb1": null,
+      "qb2": null
+    },
+    {
       "name": "Ja'Kobi Lane",
       "key": "jakobi lane",
       "pos": "WR",
-      "half": 14,
-      "ppr": 16,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Antonio Williams",
-      "key": "antonio williams",
-      "pos": "WR",
-      "half": 14,
-      "ppr": 16,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tre Tucker",
-      "key": "tre tucker",
-      "pos": "WR",
-      "half": 14,
-      "ppr": 16,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Malik Washington",
-      "key": "malik washington",
-      "pos": "WR",
       "half": 13,
       "ppr": 15,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Keenan Allen",
-      "key": "keenan allen",
-      "pos": "WR",
-      "half": 13,
-      "ppr": 15,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jaylin Noel",
-      "key": "jaylin noel",
-      "pos": "WR",
-      "half": 13,
-      "ppr": 15,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Josh Downs",
-      "key": "josh downs",
-      "pos": "WR",
-      "half": 13,
-      "ppr": 15,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Devaughn Vele",
-      "key": "devaughn vele",
+      "name": "Travis Hunter",
+      "key": "travis hunter",
       "pos": "WR",
       "half": 12,
       "ppr": 14,
@@ -1657,29 +1657,11 @@
       "qb2": null
     },
     {
-      "name": "Wan'Dale Robinson",
-      "key": "wandale robinson",
-      "pos": "WR",
-      "half": 11,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Keon Coleman",
-      "key": "keon coleman",
-      "pos": "WR",
-      "half": 11,
-      "ppr": 13,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Khalil Shakir",
       "key": "khalil shakir",
       "pos": "WR",
-      "half": 10,
-      "ppr": 12,
+      "half": 11,
+      "ppr": 13,
       "qb1": null,
       "qb2": null
     },
@@ -1687,35 +1669,8 @@
       "name": "Marvin Harrison Jr.",
       "key": "marvin harrison",
       "pos": "WR",
-      "half": 10,
-      "ppr": 12,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Dontayvion Wicks",
-      "key": "dontayvion wicks",
-      "pos": "WR",
-      "half": 8,
-      "ppr": 10,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Makai Lemon",
-      "key": "makai lemon",
-      "pos": "WR",
-      "half": 8,
-      "ppr": 10,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Chris Bell",
-      "key": "chris bell",
-      "pos": "WR",
-      "half": 8,
-      "ppr": 10,
+      "half": 11,
+      "ppr": 13,
       "qb1": null,
       "qb2": null
     },
@@ -1723,17 +1678,26 @@
       "name": "Brian Thomas Jr.",
       "key": "brian thomas",
       "pos": "WR",
-      "half": 8,
-      "ppr": 10,
+      "half": 10,
+      "ppr": 12,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "DeMario Douglas",
-      "key": "demario douglas",
+      "name": "Wan'Dale Robinson",
+      "key": "wandale robinson",
       "pos": "WR",
-      "half": 8,
-      "ppr": 10,
+      "half": 9,
+      "ppr": 11,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Chris Godwin Jr.",
+      "key": "chris godwin",
+      "pos": "WR",
+      "half": 9,
+      "ppr": 11,
       "qb1": null,
       "qb2": null
     },
@@ -1741,14 +1705,41 @@
       "name": "Ryan Flournoy",
       "key": "ryan flournoy",
       "pos": "WR",
+      "half": 9,
+      "ppr": 11,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Devaughn Vele",
+      "key": "devaughn vele",
+      "pos": "WR",
+      "half": 8,
+      "ppr": 10,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Courtland Sutton",
+      "key": "courtland sutton",
+      "pos": "WR",
+      "half": 8,
+      "ppr": 10,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Keon Coleman",
+      "key": "keon coleman",
+      "pos": "WR",
       "half": 8,
       "ppr": 9,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Kendrick Bourne",
-      "key": "kendrick bourne",
+      "name": "Jaylin Noel",
+      "key": "jaylin noel",
       "pos": "WR",
       "half": 8,
       "ppr": 9,
@@ -1759,17 +1750,8 @@
       "name": "Adonai Mitchell",
       "key": "adonai mitchell",
       "pos": "WR",
-      "half": 7,
-      "ppr": 8,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Davante Adams",
-      "key": "davante adams",
-      "pos": "WR",
-      "half": 7,
-      "ppr": 8,
+      "half": 8,
+      "ppr": 9,
       "qb1": null,
       "qb2": null
     },
@@ -1777,14 +1759,32 @@
       "name": "Alec Pierce",
       "key": "alec pierce",
       "pos": "WR",
-      "half": 7,
-      "ppr": 8,
+      "half": 8,
+      "ppr": 9,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Konata Mumpfield",
-      "key": "konata mumpfield",
+      "name": "Malachi Fields",
+      "key": "malachi fields",
+      "pos": "WR",
+      "half": 8,
+      "ppr": 9,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tre' Harris",
+      "key": "tre harris",
+      "pos": "WR",
+      "half": 8,
+      "ppr": 9,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Quentin Johnston",
+      "key": "quentin johnston",
       "pos": "WR",
       "half": 7,
       "ppr": 8,
@@ -1792,8 +1792,8 @@
       "qb2": null
     },
     {
-      "name": "Travis Hunter",
-      "key": "travis hunter",
+      "name": "Rashod Bateman",
+      "key": "rashod bateman",
       "pos": "WR",
       "half": 7,
       "ppr": 8,
@@ -1810,17 +1810,8 @@
       "qb2": null
     },
     {
-      "name": "Brandin Cooks",
-      "key": "brandin cooks",
-      "pos": "WR",
-      "half": 7,
-      "ppr": 8,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Courtland Sutton",
-      "key": "courtland sutton",
+      "name": "Dontayvion Wicks",
+      "key": "dontayvion wicks",
       "pos": "WR",
       "half": 6,
       "ppr": 7,
@@ -1828,8 +1819,8 @@
       "qb2": null
     },
     {
-      "name": "Caleb Douglas",
-      "key": "caleb douglas",
+      "name": "Chris Bell",
+      "key": "chris bell",
       "pos": "WR",
       "half": 6,
       "ppr": 7,
@@ -1837,8 +1828,8 @@
       "qb2": null
     },
     {
-      "name": "Chris Godwin Jr.",
-      "key": "chris godwin",
+      "name": "DeMario Douglas",
+      "key": "demario douglas",
       "pos": "WR",
       "half": 6,
       "ppr": 7,
@@ -1846,11 +1837,38 @@
       "qb2": null
     },
     {
-      "name": "Malachi Fields",
-      "key": "malachi fields",
+      "name": "Kendrick Bourne",
+      "key": "kendrick bourne",
       "pos": "WR",
       "half": 6,
       "ppr": 7,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Davante Adams",
+      "key": "davante adams",
+      "pos": "WR",
+      "half": 6,
+      "ppr": 7,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Romeo Doubs",
+      "key": "romeo doubs",
+      "pos": "WR",
+      "half": 5,
+      "ppr": 6,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "De'Zhaun Stribling",
+      "key": "dezhaun stribling",
+      "pos": "WR",
+      "half": 5,
+      "ppr": 6,
       "qb1": null,
       "qb2": null
     },
@@ -1858,8 +1876,17 @@
       "name": "Jahan Dotson",
       "key": "jahan dotson",
       "pos": "WR",
-      "half": 6,
-      "ppr": 7,
+      "half": 5,
+      "ppr": 6,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Konata Mumpfield",
+      "key": "konata mumpfield",
+      "pos": "WR",
+      "half": 5,
+      "ppr": 6,
       "qb1": null,
       "qb2": null
     },
@@ -1873,11 +1900,11 @@
       "qb2": null
     },
     {
-      "name": "Rashod Bateman",
-      "key": "rashod bateman",
+      "name": "Brandin Cooks",
+      "key": "brandin cooks",
       "pos": "WR",
-      "half": 5,
-      "ppr": 6,
+      "half": 4,
+      "ppr": 5,
       "qb1": null,
       "qb2": null
     },
@@ -1887,33 +1914,6 @@
       "pos": "WR",
       "half": 4,
       "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Romeo Doubs",
-      "key": "romeo doubs",
-      "pos": "WR",
-      "half": 4,
-      "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tre' Harris",
-      "key": "tre harris",
-      "pos": "WR",
-      "half": 4,
-      "ppr": 5,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Quentin Johnston",
-      "key": "quentin johnston",
-      "pos": "WR",
-      "half": 3,
-      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1936,47 +1936,11 @@
       "qb2": null
     },
     {
-      "name": "De'Zhaun Stribling",
-      "key": "dezhaun stribling",
-      "pos": "WR",
-      "half": 2,
-      "ppr": 3,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Pat Bryant",
-      "key": "pat bryant",
-      "pos": "WR",
-      "half": 2,
-      "ppr": 3,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Kyle Williams",
-      "key": "kyle williams",
-      "pos": "WR",
-      "half": 2,
-      "ppr": 3,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Efton Chism III",
-      "key": "efton chism",
-      "pos": "WR",
-      "half": 1,
-      "ppr": 2,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Michael Pittman Jr.",
       "key": "michael pittman",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1984,8 +1948,8 @@
       "name": "Jauan Jennings",
       "key": "jauan jennings",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -1993,8 +1957,8 @@
       "name": "Jalen Royals",
       "key": "jalen royals",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -2002,8 +1966,8 @@
       "name": "Josh Cameron",
       "key": "josh cameron",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -2011,17 +1975,8 @@
       "name": "Treylon Burks",
       "key": "treylon burks",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Christian Kirk",
-      "key": "christian kirk",
-      "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 3,
+      "ppr": 4,
       "qb1": null,
       "qb2": null
     },
@@ -2029,17 +1984,17 @@
       "name": "Jerry Jeudy",
       "key": "jerry jeudy",
       "pos": "WR",
-      "half": 1,
-      "ppr": 1,
+      "half": 2,
+      "ppr": 3,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Ted Hurst III",
-      "key": "ted hurst",
+      "name": "Savion Williams",
+      "key": "savion williams",
       "pos": "WR",
-      "half": 0,
-      "ppr": 0,
+      "half": 2,
+      "ppr": 3,
       "qb1": null,
       "qb2": null
     },
@@ -2047,8 +2002,17 @@
       "name": "Isaac TeSlaa",
       "key": "isaac teslaa",
       "pos": "WR",
-      "half": 0,
-      "ppr": 0,
+      "half": 1,
+      "ppr": 2,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Ted Hurst III",
+      "key": "ted hurst",
+      "pos": "WR",
+      "half": 1,
+      "ppr": 1,
       "qb1": null,
       "qb2": null
     },
@@ -2056,14 +2020,23 @@
       "name": "Cyrus Allen",
       "key": "cyrus allen",
       "pos": "WR",
+      "half": 1,
+      "ppr": 1,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Pat Bryant",
+      "key": "pat bryant",
+      "pos": "WR",
       "half": 0,
       "ppr": 0,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Savion Williams",
-      "key": "savion williams",
+      "name": "Christian Kirk",
+      "key": "christian kirk",
       "pos": "WR",
       "half": 0,
       "ppr": 0,
@@ -2080,8 +2053,8 @@
       "qb2": null
     },
     {
-      "name": "Zachariah Branch",
-      "key": "zachariah branch",
+      "name": "Darius Cooper",
+      "key": "darius cooper",
       "pos": "WR",
       "half": 0,
       "ppr": 0,
@@ -2089,8 +2062,53 @@
       "qb2": null
     },
     {
-      "name": "Kayshon Boutte",
-      "key": "kayshon boutte",
+      "name": "Cooper Kupp",
+      "key": "cooper kupp",
+      "pos": "WR",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Troy Franklin",
+      "key": "troy franklin",
+      "pos": "WR",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Marvin Mims Jr.",
+      "key": "marvin mims",
+      "pos": "WR",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tez Johnson",
+      "key": "tez johnson",
+      "pos": "WR",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tank Dell",
+      "key": "tank dell",
+      "pos": "WR",
+      "half": 0,
+      "ppr": 0,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Zachariah Branch",
+      "key": "zachariah branch",
       "pos": "WR",
       "half": 0,
       "ppr": 0,
@@ -2101,17 +2119,8 @@
       "name": "Brock Bowers",
       "key": "brock bowers",
       "pos": "TE",
-      "half": 62,
-      "ppr": 65,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "George Kittle",
-      "key": "george kittle",
-      "pos": "TE",
-      "half": 53,
-      "ppr": 56,
+      "half": 64,
+      "ppr": 69,
       "qb1": null,
       "qb2": null
     },
@@ -2119,14 +2128,23 @@
       "name": "Trey McBride",
       "key": "trey mcbride",
       "pos": "TE",
-      "half": 44,
-      "ppr": 47,
+      "half": 56,
+      "ppr": 59,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Isaiah Likely",
-      "key": "isaiah likely",
+      "name": "George Kittle",
+      "key": "george kittle",
+      "pos": "TE",
+      "half": 52,
+      "ppr": 55,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Colston Loveland",
+      "key": "colston loveland",
       "pos": "TE",
       "half": 36,
       "ppr": 39,
@@ -2134,11 +2152,29 @@
       "qb2": null
     },
     {
-      "name": "Sam LaPorta",
-      "key": "sam laporta",
+      "name": "Isaiah Likely",
+      "key": "isaiah likely",
       "pos": "TE",
       "half": 31,
       "ppr": 34,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Sam LaPorta",
+      "key": "sam laporta",
+      "pos": "TE",
+      "half": 29,
+      "ppr": 32,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tucker Kraft",
+      "key": "tucker kraft",
+      "pos": "TE",
+      "half": 27,
+      "ppr": 30,
       "qb1": null,
       "qb2": null
     },
@@ -2152,38 +2188,11 @@
       "qb2": null
     },
     {
-      "name": "Colston Loveland",
-      "key": "colston loveland",
-      "pos": "TE",
-      "half": 20,
-      "ppr": 22,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Dalton Kincaid",
       "key": "dalton kincaid",
       "pos": "TE",
-      "half": 19,
-      "ppr": 21,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tucker Kraft",
-      "key": "tucker kraft",
-      "pos": "TE",
-      "half": 19,
-      "ppr": 21,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Travis Kelce",
-      "key": "travis kelce",
-      "pos": "TE",
-      "half": 17,
-      "ppr": 19,
+      "half": 18,
+      "ppr": 22,
       "qb1": null,
       "qb2": null
     },
@@ -2191,8 +2200,26 @@
       "name": "Dallas Goedert",
       "key": "dallas goedert",
       "pos": "TE",
+      "half": 15,
+      "ppr": 18,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Travis Kelce",
+      "key": "travis kelce",
+      "pos": "TE",
       "half": 14,
-      "ppr": 16,
+      "ppr": 17,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Harold Fannin Jr.",
+      "key": "harold fannin",
+      "pos": "TE",
+      "half": 14,
+      "ppr": 17,
       "qb1": null,
       "qb2": null
     },
@@ -2200,8 +2227,8 @@
       "name": "Kyle Pitts Sr.",
       "key": "kyle pitts",
       "pos": "TE",
-      "half": 13,
-      "ppr": 15,
+      "half": 14,
+      "ppr": 16,
       "qb1": null,
       "qb2": null
     },
@@ -2215,29 +2242,11 @@
       "qb2": null
     },
     {
-      "name": "Tyler Higbee",
-      "key": "tyler higbee",
-      "pos": "TE",
-      "half": 12,
-      "ppr": 14,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Harold Fannin Jr.",
-      "key": "harold fannin",
-      "pos": "TE",
-      "half": 10,
-      "ppr": 12,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Brenton Strange",
       "key": "brenton strange",
       "pos": "TE",
-      "half": 10,
-      "ppr": 12,
+      "half": 12,
+      "ppr": 15,
       "qb1": null,
       "qb2": null
     },
@@ -2245,8 +2254,8 @@
       "name": "Hunter Henry",
       "key": "hunter henry",
       "pos": "TE",
-      "half": 10,
-      "ppr": 11,
+      "half": 12,
+      "ppr": 14,
       "qb1": null,
       "qb2": null
     },
@@ -2254,14 +2263,14 @@
       "name": "T.J. Hockenson",
       "key": "tj hockenson",
       "pos": "TE",
-      "half": 9,
-      "ppr": 10,
+      "half": 11,
+      "ppr": 13,
       "qb1": null,
       "qb2": null
     },
     {
-      "name": "Juwan Johnson",
-      "key": "juwan johnson",
+      "name": "Terrance Ferguson",
+      "key": "terrance ferguson",
       "pos": "TE",
       "half": 9,
       "ppr": 10,
@@ -2272,17 +2281,8 @@
       "name": "Pat Freiermuth",
       "key": "pat freiermuth",
       "pos": "TE",
-      "half": 7,
-      "ppr": 8,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Terrance Ferguson",
-      "key": "terrance ferguson",
-      "pos": "TE",
-      "half": 7,
-      "ppr": 8,
+      "half": 9,
+      "ppr": 10,
       "qb1": null,
       "qb2": null
     },
@@ -2290,14 +2290,50 @@
       "name": "Michael Mayer",
       "key": "michael mayer",
       "pos": "TE",
-      "half": 7,
-      "ppr": 8,
+      "half": 8,
+      "ppr": 9,
       "qb1": null,
       "qb2": null
     },
     {
       "name": "Mark Andrews",
       "key": "mark andrews",
+      "pos": "TE",
+      "half": 7,
+      "ppr": 8,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Mason Taylor",
+      "key": "mason taylor",
+      "pos": "TE",
+      "half": 7,
+      "ppr": 8,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Mike Gesicki",
+      "key": "mike gesicki",
+      "pos": "TE",
+      "half": 7,
+      "ppr": 8,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Tyler Higbee",
+      "key": "tyler higbee",
+      "pos": "TE",
+      "half": 7,
+      "ppr": 8,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Juwan Johnson",
+      "key": "juwan johnson",
       "pos": "TE",
       "half": 6,
       "ppr": 7,
@@ -2314,20 +2350,11 @@
       "qb2": null
     },
     {
-      "name": "Mike Gesicki",
-      "key": "mike gesicki",
+      "name": "Greg Dulcich",
+      "key": "greg dulcich",
       "pos": "TE",
-      "half": 5,
-      "ppr": 6,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Jake Ferguson",
-      "key": "jake ferguson",
-      "pos": "TE",
-      "half": 5,
-      "ppr": 6,
+      "half": 6,
+      "ppr": 7,
       "qb1": null,
       "qb2": null
     },
@@ -2341,17 +2368,8 @@
       "qb2": null
     },
     {
-      "name": "Colby Parkinson",
-      "key": "colby parkinson",
-      "pos": "TE",
-      "half": 5,
-      "ppr": 6,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "AJ Barner",
-      "key": "aj barner",
+      "name": "Dalton Schultz",
+      "key": "dalton schultz",
       "pos": "TE",
       "half": 4,
       "ppr": 5,
@@ -2359,8 +2377,8 @@
       "qb2": null
     },
     {
-      "name": "Oronde Gadsden II",
-      "key": "oronde gadsden",
+      "name": "Jake Ferguson",
+      "key": "jake ferguson",
       "pos": "TE",
       "half": 3,
       "ppr": 4,
@@ -2368,8 +2386,8 @@
       "qb2": null
     },
     {
-      "name": "Dalton Schultz",
-      "key": "dalton schultz",
+      "name": "AJ Barner",
+      "key": "aj barner",
       "pos": "TE",
       "half": 2,
       "ppr": 3,
@@ -2377,8 +2395,26 @@
       "qb2": null
     },
     {
+      "name": "Colby Parkinson",
+      "key": "colby parkinson",
+      "pos": "TE",
+      "half": 1,
+      "ppr": 2,
+      "qb1": null,
+      "qb2": null
+    },
+    {
       "name": "Darnell Washington",
       "key": "darnell washington",
+      "pos": "TE",
+      "half": 1,
+      "ppr": 2,
+      "qb1": null,
+      "qb2": null
+    },
+    {
+      "name": "Oronde Gadsden II",
+      "key": "oronde gadsden",
       "pos": "TE",
       "half": 1,
       "ppr": 2,
@@ -2395,8 +2431,8 @@
       "qb2": null
     },
     {
-      "name": "Greg Dulcich",
-      "key": "greg dulcich",
+      "name": "Evan Engram",
+      "key": "evan engram",
       "pos": "TE",
       "half": 1,
       "ppr": 1,
@@ -2404,38 +2440,11 @@
       "qb2": null
     },
     {
-      "name": "Evan Engram",
-      "key": "evan engram",
-      "pos": "TE",
-      "half": 0,
-      "ppr": 0,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Mason Taylor",
-      "key": "mason taylor",
-      "pos": "TE",
-      "half": 0,
-      "ppr": 0,
-      "qb1": null,
-      "qb2": null
-    },
-    {
       "name": "Eli Raridon",
       "key": "eli raridon",
       "pos": "TE",
-      "half": 0,
-      "ppr": 0,
-      "qb1": null,
-      "qb2": null
-    },
-    {
-      "name": "Tommy Tremble",
-      "key": "tommy tremble",
-      "pos": "TE",
-      "half": 0,
-      "ppr": 0,
+      "half": 1,
+      "ppr": 1,
       "qb1": null,
       "qb2": null
     },
@@ -2449,8 +2458,8 @@
       "qb2": null
     },
     {
-      "name": "Dawson Knox",
-      "key": "dawson knox",
+      "name": "Tommy Tremble",
+      "key": "tommy tremble",
       "pos": "TE",
       "half": 0,
       "ppr": 0,
