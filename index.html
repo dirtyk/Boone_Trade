@@ -200,7 +200,11 @@
   .ss-list .name small { display: block; font-size: 12px; color: var(--muted); }
   .ss-list .rk { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 14px; white-space: nowrap; }
   .ss-list li.new { background: rgba(47,191,113,.08); box-shadow: inset 3px 0 0 var(--win); padding-left: 8px; }
-  .ss-list .was { color: var(--lose); }
+  .ss-list li.moved { background: rgba(90,150,255,.07); box-shadow: inset 3px 0 0 #5a96ff; padding-left: 8px; }
+  .ss-list .tag-new { color: var(--win); }
+  .ss-list .tag-mv { color: #7fb0ff; }
+  .ss-moves .mv { color: #7fb0ff; font-weight: 800; }
+  .ss-sub { margin-top: 12px; font-weight: 700; font-size: 14px; }
   .ss-moves { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
   .ss-moves li { font-size: 15px; }
   .ss-moves .in { color: var(--win); font-weight: 800; }
@@ -1275,12 +1279,47 @@
       const roster = rosterList.find((r) => r.owner_id === ss.user.user_id || (r.co_owners || []).includes(ss.user.user_id));
       if (!roster) throw new Error("Couldn't find your team in that league.");
       const ppr = (league.scoring_settings?.rec || 0) >= 1;
-      const result = ssBuild(league, roster, pmap, rk, ppr);
-      ssRender(result, rk, ppr);
+      const games = await ssGames(Number(ss.state.season), ss.state.week || rk.week, rk);
+      const result = ssBuild(league, roster, pmap, rk, ppr, games);
+      ssRender(result, rk, ppr, games);
     } catch (e) { ssStatus(e.message, true); }
   }
 
-  function ssBuild(league, roster, pmap, rk, ppr) {
+  // This week's games by team: { kick (ms), exact (has a real kickoff time), locked }.
+  // Sleeper's schedule gives the date and live status; exact kickoff times come
+  // from rankings.json (written by the Action from ESPN), else ESPN directly.
+  // Every source is optional - without them the lineup just isn't time-sorted.
+  async function ssGames(season, week, rk) {
+    const games = new Map();
+    const team = (t) => (t === 'WSH' ? 'WAS' : t);
+    const set = (t, g) => games.set(team(t), { ...(games.get(team(t)) || {}), ...g });
+    try {
+      const sched = await getJson(`https://api.sleeper.app/schedule/nfl/regular/${season}`);
+      for (const g of sched) {
+        if (g.week !== week) continue;
+        const kick = Date.parse(`${g.date}T12:00:00`);
+        for (const t of [g.home, g.away]) set(t, { kick, exact: false, locked: g.status !== 'pre_game' });
+      }
+    } catch (e) { console.warn('Sleeper schedule unavailable', e); }
+    let kicks = rk.week === week && rk.kickoffs ? rk.kickoffs : null;
+    if (!kicks) {
+      try {
+        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${week}&dates=${season}`);
+        const d = await res.json();
+        kicks = {};
+        for (const ev of d.events || []) for (const c of ev.competitions?.[0]?.competitors || []) kicks[c.team.abbreviation] = ev.date;
+      } catch (e) { console.warn('ESPN schedule unavailable', e); }
+    }
+    const now = Date.now();
+    for (const [t, iso] of Object.entries(kicks || {})) {
+      const kick = Date.parse(iso);
+      if (isNaN(kick)) continue;
+      set(t, { kick, exact: true, ...(kick <= now ? { locked: true } : {}) });
+    }
+    return games;
+  }
+
+  function ssBuild(league, roster, pmap, rk, ppr, games) {
     const ranks = new Map();
     const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], K: rk.lists.K, DEF: rk.lists.DEF };
     for (const [list, rows] of Object.entries(lists)) for (const r of rows || []) if (r.id) ranks.set(r.id, { list, ...r });
@@ -1289,13 +1328,17 @@
       if (!id || id === '0') return null;
       const [name, pos, inj, team] = pmap[id] || [];
       const r = ranks.get(id);
+      const t = team || r?.team || '';
+      const g = games.get(t);
       return {
-        id, name: name || r?.name || id, pos: pos || r?.pos || '?', team: team || r?.team || '', inj: inj || '',
+        id, name: name || r?.name || id, pos: pos || r?.pos || '?', team: t, inj: inj || '',
         list: r?.list || null, rank: r?.rank || null, opp: r?.opp || '',
+        kick: g ? g.kick : null, exact: !!g?.exact, locked: !!g?.locked, bye: games.size > 0 && !g && !!t,
       };
     };
 
     const slots = (league.roster_positions || []).filter((s) => !['BN', 'IR', 'TAXI'].includes(s));
+    const elig = (i) => SS_ELIG[slots[i]] || [slots[i]];
     const current = (roster.starters || []).slice(0, slots.length);
     while (current.length < slots.length) current.push('0');
     const currentSet = new Set(current.filter((id) => id && id !== '0'));
@@ -1304,29 +1347,56 @@
     const healthy = (p) => !SS_UNAVAILABLE.has(p.inj);
     const key = (p) => (p.rank && healthy(p) ? p.rank : null);
 
-    // Your QB/superflex picks are locked in first; then single-position slots,
-    // then flex slots from most to least restrictive.
-    const order = slots.map((slot, i) => ({ slot, i, elig: SS_ELIG[slot] || [slot] }))
-      .sort((a, b) => SS_YOURS.has(b.slot) - SS_YOURS.has(a.slot) || a.elig.length - b.elig.length || a.i - b.i);
+    // 1. Fixed: your QB/superflex calls, plus anyone whose game has kicked off
+    //    (Sleeper has locked them into that slot).
     const used = new Set();
     const picks = new Array(slots.length).fill(null);
-    for (const { slot, i, elig } of order) {
-      if (SS_YOURS.has(slot)) {
-        const mine = info(current[i]);
+    const open = [];
+    slots.forEach((slot, i) => {
+      const mine = info(current[i]);
+      if (SS_YOURS.has(slot) || (mine && mine.locked)) {
         if (mine) used.add(mine.id);
-        picks[i] = mine && { ...mine, yours: true };
-        continue;
-      }
-      const cands = pool.filter((p) => !used.has(p.id) && elig.includes(p.pos));
+        picks[i] = mine && { ...mine, yours: SS_YOURS.has(slot) };
+      } else open.push(i);
+    });
+
+    // 2. WHO starts: best flex rank wins. Single-position slots first, then flex
+    //    slots from most to least restrictive. Locked bench players can't come in.
+    const starters = [];
+    const byNeed = open.slice().sort((a, b) => elig(a).length - elig(b).length || a - b);
+    for (const i of byNeed) {
+      const cands = pool.filter((p) => !used.has(p.id) && !p.locked && elig(i).includes(p.pos));
       let best = null, bestKey = Infinity;
       for (const c of cands) { const k = key(c); if (k != null && k < bestKey) { best = c; bestKey = k; } }
       // Nobody ranked (bye, injuries, IDP slot): keep Sleeper's pick, else any healthy body.
       if (!best) best = cands.find((c) => c.id === current[i]) || cands.find(healthy) || null;
-      if (best) used.add(best.id);
-      picks[i] = best;
+      if (best) { used.add(best.id); starters.push(best); }
     }
 
-    // Two starters trading places within identical slots (RB1/RB2) isn't a change.
+    // 3. WHERE they start: latest kickoffs go in the flex slots (most flexible
+    //    first) so late swaps stay possible; earlier games fill RB/WR/TE.
+    const fits = (players, idxs) => {
+      if (!players.length) return true;
+      const [p, ...rest] = players;
+      return idxs.some((i, k) => elig(i).includes(p.pos) && fits(rest, idxs.filter((_, j) => j !== k)));
+    };
+    const late = (p) => (p.kick == null ? -Infinity : p.kick);
+    let left = starters.slice(), slotsLeft = open.slice();
+    const place = (i, sortFn) => {
+      slotsLeft = slotsLeft.filter((x) => x !== i);
+      const cands = left.filter((p) => elig(i).includes(p.pos)).sort(sortFn);
+      const p = cands.find((c) => fits(left.filter((x) => x !== c), slotsLeft));
+      if (p) left = left.filter((x) => x !== p);
+      picks[i] = p || null;
+    };
+    const stay = (i) => (a, b) => (b.id === current[i]) - (a.id === current[i]);
+    open.filter((i) => elig(i).length > 1)
+      .sort((a, b) => elig(b).length - elig(a).length || a - b)
+      .forEach((i) => place(i, (a, b) => late(b) - late(a) || stay(i)(a, b)));
+    open.filter((i) => elig(i).length === 1)
+      .forEach((i) => place(i, (a, b) => stay(i)(a, b) || late(a) - late(b)));
+
+    // Two starters trading places within identical slots (WR1/WR2) isn't a change.
     const groups = new Map();
     slots.forEach((s, i) => groups.set(s, [...(groups.get(s) || []), i]));
     for (const idxs of groups.values()) {
@@ -1339,12 +1409,30 @@
       idxs.forEach((i, k) => (picks[i] = placed[k] || rest.shift() || null));
     }
 
+    const wasAt = new Map();
+    current.forEach((id, i) => id && id !== '0' && wasAt.set(id, i));
+    const lineup = slots.map((slot, i) => {
+      const pick = picks[i];
+      const w = pick ? wasAt.get(pick.id) : undefined;
+      const status = !pick ? '' : w === undefined ? 'new' : slots[w] !== slot ? 'moved' : '';
+      return { slot, pick, status, from: status === 'moved' ? slots[w] : null };
+    });
+
     const pickSet = new Set(picks.filter(Boolean).map((p) => p.id));
     const byRank = (a, b) => (a.rank || 999) - (b.rank || 999);
+    const start = picks.filter((p) => p && !currentSet.has(p.id)).sort(byRank);
+    const sit = [...currentSet].filter((id) => !pickSet.has(id)).map(info).sort(byRank);
+    // Pair each start with a sit of the same position when there is one.
+    const sitLeft = sit.slice();
+    const swaps = start.map((p) => {
+      let k = sitLeft.findIndex((s) => s.pos === p.pos);
+      if (k === -1) k = 0;
+      return { in: p, out: sitLeft.splice(k, 1)[0] || null };
+    });
+    sitLeft.forEach((s) => swaps.push({ in: null, out: s }));
     return {
-      lineup: slots.map((slot, i) => ({ slot, now: info(current[i]), pick: picks[i], isNew: !!picks[i] && !currentSet.has(picks[i].id) })),
-      start: picks.filter((p) => p && !currentSet.has(p.id)),
-      sit: [...currentSet].filter((id) => !pickSet.has(id)).map(info).sort(byRank),
+      lineup, swaps,
+      moves: lineup.filter((r) => r.status === 'moved'),
       bench: pool.filter((p) => !pickSet.has(p.id)).sort(byRank),
     };
   }
@@ -1352,29 +1440,37 @@
   const ssRank = (p) => (p && p.yours ? 'your call' : p && p.rank ? `${p.list} #${p.rank}` : '—');
   const ssInj = (p) => (p && p.inj ? `<span class="inj${SS_UNAVAILABLE.has(p.inj) || p.inj === 'Doubtful' ? '' : ' q'}">${esc(INJ_ABBR[p.inj] || p.inj)}</span>` : '');
   const ssPos = (pos) => `<span class="pos ${['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(pos) ? pos : 'X'}">${esc(pos)}</span>`;
-  const ssSub = (p) => [p.team, p.opp].filter(Boolean).map(esc).join(' · ');
+  const ssSlot = (s) => (s === 'SUPER_FLEX' ? 'SF' : s.replace('_FLEX', '').replace('WRRB', 'W/R').replace('REC', 'W/T'));
+  const ssKick = (p) => {
+    if (p.bye) return 'BYE';
+    if (p.kick == null) return '';
+    const opts = p.exact ? { weekday: 'short', hour: 'numeric', minute: '2-digit' } : { weekday: 'short' };
+    return new Date(p.kick).toLocaleString(undefined, opts) + (p.locked ? ' 🔒' : '');
+  };
+  const ssSub = (p) => [p.team, p.opp, ssKick(p)].filter(Boolean).map(esc).join(' · ');
 
-  function ssRender(res, rk, ppr) {
+  function ssRender(res, rk, ppr, games) {
     const when = rk.updated ? new Date(rk.updated.replace(' ', 'T')) : null;
     const whenTxt = when && !isNaN(when)
       ? when.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
       : (rk.updated || 'unknown');
     const stale = ss.state && ss.state.week && rk.week !== ss.state.week
       ? ` Boone hasn't posted Week ${ss.state.week} yet.` : '';
-    ssStatus(`Boone's Week ${rk.week} ${ppr ? 'PPR' : 'Half-PPR'} rankings · updated ${whenTxt}.${stale}`, !!stale);
+    const noTimes = ![...games.values()].some((g) => g.exact)
+      ? ' Kickoff times unavailable, so flex slots are sorted by game day only.' : '';
+    ssStatus(`Boone's Week ${rk.week} ${ppr ? 'PPR' : 'Half-PPR'} rankings · updated ${whenTxt}.${stale}${noTimes}`, !!stale);
 
-    $('#ss-moves').innerHTML = res.start.length
-      ? `<ul class="ss-moves">${res.start.map((p, i) => {
-          const out = res.sit[i];
-          return `<li><span class="in">Start</span> ${esc(p.name)} <small class="status">(${ssRank(p)})</small>${out ? `<br><span class="out">Sit</span> ${esc(out.name)} <small class="status">(${ssRank(out)})</small>` : ''}</li>`;
-        }).join('')}</ul>`
+    const swapHtml = res.swaps.map((s) => `<li>${s.in ? `<span class="in">Start</span> ${esc(s.in.name)} <small class="status">(${ssRank(s.in)})</small>` : ''}${s.in && s.out ? '<br>' : ''}${s.out ? `<span class="out">Sit</span> ${esc(s.out.name)} <small class="status">(${ssRank(s.out)})</small>` : ''}</li>`).join('');
+    const moveHtml = res.moves.map((m) => `<li><span class="mv">Move</span> ${esc(m.pick.name)} <small class="status">${ssSlot(m.from)} → ${ssSlot(m.slot)}</small></li>`).join('');
+    $('#ss-moves').innerHTML = swapHtml || moveHtml
+      ? `<ul class="ss-moves">${swapHtml}</ul>${moveHtml ? `<div class="ss-sub">Slot moves <small class="status">(later games go in FLEX for late swaps)</small></div><ul class="ss-moves">${moveHtml}</ul>` : ''}`
       : '<div class="hint" style="margin-top:0">No changes — your Sleeper lineup already matches Boone.</div>';
 
-    $('#ss-lineup').innerHTML = res.lineup.map(({ slot, now, pick, isNew }) => `
-      <li class="${isNew ? 'new' : ''}">
-        ${ssPos(slot === 'SUPER_FLEX' ? 'SF' : slot.replace('_FLEX', '').replace('WRRB', 'W/R').replace('REC', 'W/T'))}
+    $('#ss-lineup').innerHTML = res.lineup.map(({ slot, pick, status, from }) => `
+      <li class="${status}">
+        ${ssPos(ssSlot(slot))}
         <div class="name">${pick ? `${esc(pick.name)}${ssInj(pick)}` : '<span class="status">(empty)</span>'}
-          <small>${pick ? ssSub(pick) : ''}${isNew ? ` · <span class="was">replaces ${now ? esc(now.name) : 'empty slot'}</span>` : ''}</small></div>
+          <small>${pick ? ssSub(pick) : ''}${status === 'new' ? ' · <span class="tag-new">new starter</span>' : status === 'moved' ? ` · <span class="tag-mv">from ${ssSlot(from)}</span>` : ''}</small></div>
         <span class="rk">${ssRank(pick)}</span>
       </li>`).join('');
 

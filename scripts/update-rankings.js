@@ -92,6 +92,25 @@ function matchId(row, idx) {
   return byLast.length === 1 ? byLast[0] : null;
 }
 
+// Kickoff time per team for the week (ESPN, Sleeper team codes), so the page
+// can put later games in FLEX slots. Optional: on failure it's just left out.
+async function fetchKickoffs(week, season) {
+  try {
+    const d = await getJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week=${week}&dates=${season}`);
+    const kicks = {};
+    for (const ev of d.events || []) {
+      for (const c of (ev.competitions && ev.competitions[0] && ev.competitions[0].competitors) || []) {
+        const t = c.team.abbreviation === 'WSH' ? 'WAS' : c.team.abbreviation;
+        kicks[t] = new Date(ev.date).toISOString();
+      }
+    }
+    return Object.keys(kicks).length ? kicks : null;
+  } catch (e) {
+    console.warn(`warn: no kickoff times (${e.message})`);
+    return null;
+  }
+}
+
 async function main() {
   const state = await getJson(`${SL}/state/nfl`);
   const week = state.week;
@@ -125,7 +144,8 @@ async function main() {
   });
   if (unmatched.length) console.warn(`warn: no Sleeper match for ${unmatched.join(', ')}`);
 
-  const out = { season, week, updated, lists };
+  const kickoffs = await fetchKickoffs(week, season);
+  const out = { season, week, updated, lists, ...(kickoffs ? { kickoffs } : {}) };
   fs.writeFileSync(OUT_FILE, JSON.stringify(out) + '\n');
   console.log(`Wrote Week ${week} rankings (Boone updated ${updated}) -> ${path.relative(process.cwd(), OUT_FILE)}`);
 }
