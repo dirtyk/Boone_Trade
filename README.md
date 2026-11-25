@@ -29,8 +29,9 @@ Live: https://dirtyk.github.io/Boone_Trade/
 ## Start/Sit
 
 Pick one of kkholiday's Sleeper leagues (hard-coded as `SS_USER` in `index.html`). The page loads your
-roster and the lineup set in Sleeper, then builds Boone's lineup. Boone doesn't do superflex rankings, so QB
-and SUPER_FLEX slots are left exactly as set in Sleeper (`SS_YOURS`) and QBs are never moved. The rest:
+roster and the lineup set in Sleeper, then builds Boone's lineup. QB and SUPER_FLEX
+slots start Boone's top-ranked QBs (earlier kickoff at QB, later at SF); if rankings.json has no QB list they're
+left exactly as set in Sleeper (`SS_YOURS`). The rest:
 single-position slots (RB/WR/TE/K/DEF) first with the best-ranked player at that position, then the league's
 flex slots (W/R, W/T, FLEX — most restrictive first) with the best-ranked eligible player left. FLEX uses his
 Full-PPR list when the league gives a full point per reception, Half-PPR otherwise. Players Sleeper lists as

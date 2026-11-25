@@ -1239,8 +1239,9 @@
   };
   // Never recommended to start, even if Boone's list still has them.
   const SS_UNAVAILABLE = new Set(['Out', 'IR', 'PUP', 'Sus', 'NA', 'DNR', 'COV']);
-  // Boone doesn't do superflex rankings, so QB decisions are left to you:
-  // these slots keep whoever Sleeper has there, and QBs are never moved.
+  // QB and superflex slots start Boone's top-ranked QBs (earlier game at QB,
+  // later at SF). If rankings.json has no QB list yet, they're left to you:
+  // these slots keep whoever Sleeper has there.
   const SS_YOURS = new Set(['QB', 'SUPER_FLEX']);
   const ss = { leagues: null, state: null };
   const ssStatus = (msg, err) => { const el = $('#ss-status'); el.textContent = msg; el.classList.toggle('err', !!err); };
@@ -1324,7 +1325,9 @@
 
   function ssBuild(league, roster, pmap, rk, ppr, games) {
     const ranks = new Map();
-    const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], K: rk.lists.K, DEF: rk.lists.DEF };
+    const lists = { FLEX: rk.lists[ppr ? 'FLEX_PPR' : 'FLEX_HALF'], QB: rk.lists.QB, K: rk.lists.K, DEF: rk.lists.DEF };
+    const hasQB = (rk.lists.QB || []).length > 0;
+    const yours = (slot) => !hasQB && SS_YOURS.has(slot);
     for (const [list, rows] of Object.entries(lists)) for (const r of rows || []) if (r.id) ranks.set(r.id, { list, ...r });
 
     const info = (id) => {
@@ -1357,18 +1360,48 @@
     const open = [];
     slots.forEach((slot, i) => {
       const mine = info(current[i]);
-      if (SS_YOURS.has(slot) || (mine && mine.locked)) {
+      if (yours(slot) || (mine && mine.locked)) {
         if (mine) used.add(mine.id);
-        picks[i] = mine && { ...mine, yours: SS_YOURS.has(slot) };
+        picks[i] = mine && { ...mine, yours: yours(slot) };
       } else open.push(i);
     });
+
+    // 1b. QB + superflex: Boone's top-ranked QBs, earliest game at QB, later at
+    //     SF. A superflex slot with no ranked QB left falls through to the flex
+    //     logic below (RB/WR/TE by flex rank).
+    if (hasQB) {
+      const qbSlots = open.filter((i) => slots[i] === 'QB');
+      const sfSlots = open.filter((i) => slots[i] === 'SUPER_FLEX');
+      const qbs = pool.filter((p) => p.pos === 'QB' && !used.has(p.id) && !p.locked && key(p) != null)
+        .sort((a, b) => key(a) - key(b))
+        .slice(0, qbSlots.length + sfSlots.length);
+      // Not enough ranked QBs for the QB slot(s): keep Sleeper's QB, else any healthy one.
+      for (const i of qbSlots.slice(qbs.length)) {
+        const q = pool.find((p) => p.id === current[i] && p.pos === 'QB' && !p.locked && !qbs.includes(p))
+          || pool.find((p) => p.pos === 'QB' && !p.locked && healthy(p) && !qbs.includes(p) && !used.has(p.id));
+        if (q) qbs.push(q);
+      }
+      const late = (p) => (p.kick == null ? -Infinity : p.kick);
+      const stay = (i) => (a, b) => (b.id === current[i]) - (a.id === current[i]);
+      const byKick = (i) => (a, b) => late(a) - late(b) || stay(i)(a, b);
+      let left = qbs.slice();
+      for (const i of [...qbSlots, ...sfSlots]) {
+        // Fill QB slots with the earliest games first; SF gets what's left (the later games).
+        const p = left.slice().sort(byKick(i))[0];
+        if (!p) continue;
+        left = left.filter((x) => x !== p);
+        picks[i] = p;
+        used.add(p.id);
+        open.splice(open.indexOf(i), 1);
+      }
+    }
 
     // 2. WHO starts: best flex rank wins. Single-position slots first, then flex
     //    slots from most to least restrictive. Locked bench players can't come in.
     const starters = [];
     const byNeed = open.slice().sort((a, b) => elig(a).length - elig(b).length || a - b);
     for (const i of byNeed) {
-      const cands = pool.filter((p) => !used.has(p.id) && !p.locked && elig(i).includes(p.pos));
+      const cands = pool.filter((p) => !used.has(p.id) && !p.locked && elig(i).includes(p.pos) && !(hasQB && p.pos === 'QB'));
       let best = null, bestKey = Infinity;
       for (const c of cands) { const k = key(c); if (k != null && k < bestKey) { best = c; bestKey = k; } }
       // Nobody ranked (bye, injuries, IDP slot): keep Sleeper's pick, else any healthy body.
@@ -1461,7 +1494,8 @@
       ? ` Boone hasn't posted Week ${ss.state.week} yet.` : '';
     const noTimes = ![...games.values()].some((g) => g.exact)
       ? ' Kickoff times unavailable, so flex slots are sorted by game day only.' : '';
-    ssStatus(`Boone's Week ${rk.week} ${ppr ? 'PPR' : 'Half-PPR'} rankings · updated ${whenTxt}.${stale}${noTimes}`, !!stale);
+    const noQB = !(rk.lists.QB || []).length ? ' No QB rankings yet, so QB/SF stay as set in Sleeper.' : '';
+    ssStatus(`Boone's Week ${rk.week} ${ppr ? 'PPR' : 'Half-PPR'} rankings · updated ${whenTxt}.${stale}${noTimes}${noQB}`, !!stale);
 
     const swapHtml = res.swaps.map((s) => `<li>${s.in ? `<span class="in">Start</span> ${esc(s.in.name)} <small class="status">(${ssRank(s.in)})</small>` : ''}${s.in && s.out ? '<br>' : ''}${s.out ? `<span class="out">Sit</span> ${esc(s.out.name)} <small class="status">(${ssRank(s.out)})</small>` : ''}</li>`).join('');
     const moveHtml = res.moves.map((m) => `<li><span class="mv">Move</span> ${esc(m.pick.name)} <small class="status">${ssSlot(m.from)} → ${ssSlot(m.slot)}</small></li>`).join('');

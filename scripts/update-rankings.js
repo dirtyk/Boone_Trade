@@ -30,11 +30,12 @@ const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
 
 // rankings.json list name -> [feed position, scoring]. K/DST don't change
-// with reception scoring; FLEX has separate Half and Full PPR lists. No QB
-// list: Boone doesn't do superflex rankings, so QB calls are made by hand.
+// with reception scoring; FLEX has separate Half and Full PPR lists. QB is
+// the same either way; it fills the QB and superflex slots.
 const LISTS = {
   FLEX_HALF: ['FLX', 'HALF'],
   FLEX_PPR: ['FLX', 'PPR'],
+  QB: ['QB', 'HALF'],
   K: ['K', 'HALF'],
   DEF: ['DST', 'HALF'],
 };
@@ -121,7 +122,9 @@ async function main() {
   }
 
   const names = Object.keys(LISTS);
-  const results = await Promise.all(names.map((n) => fetchList(LISTS[n][0], LISTS[n][1], week, season)));
+  // QB is optional: if that feed fails, the page just leaves QB/SF to you.
+  const results = await Promise.all(names.map((n) => fetchList(LISTS[n][0], LISTS[n][1], week, season)
+    .catch((e) => { if (n !== 'QB') throw e; console.warn(`warn: no QB list (${e.message})`); return { players: [] }; })));
   if (!(results[0].players || []).length) {
     console.log(`Boone hasn't published Week ${week} rankings yet - leaving rankings.json alone.`);
     return;
