@@ -9,6 +9,12 @@ on:
     - cron: '17 * * * *'
     - cron: '*/15 13-17 * * 0'
   workflow_dispatch:
+  # Re-run right away when the scraper changes (GitHub's schedule can lag hours).
+  push:
+    branches: [main]
+    paths:
+      - scripts/update-rankings.js
+      - .github/workflows/update-rankings.yml
 
 permissions:
   contents: write
