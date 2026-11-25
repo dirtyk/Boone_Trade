@@ -644,17 +644,20 @@
   // Sleeper's full player dump is ~5 MB; cache a trimmed QB/RB/WR/TE/K/DEF map for a day.
   async function sleeperPlayers() {
     if (sl.playerMap) return sl.playerMap;
-    const cached = store.get('btc.slPlayers3', null);
+    const cached = store.get('btc.slPlayers4', null);
     if (cached && Date.now() - cached.at < 24 * 3600e3) return (sl.playerMap = cached.map);
     slStatus('Downloading Sleeper player list (one-time, ~5 MB)…');
     const all = await getJson(`${SL}/players/nfl`);
     const map = {};
     for (const [id, p] of Object.entries(all)) {
-      if (!['QB', 'RB', 'WR', 'TE', 'K', 'DEF'].includes(p.position)) continue;
-      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), p.position, p.injury_status || '', p.team || ''];
+      // Fullbacks etc. are listed as FB but play RB for fantasy - use that.
+      const POS = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
+      const pos = POS.includes(p.position) ? p.position : (p.fantasy_positions || []).find((f) => POS.includes(f));
+      if (!pos) continue;
+      map[id] = [p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim(), pos, p.injury_status || '', p.team || ''];
     }
-    try { localStorage.removeItem('btc.slPlayers'); localStorage.removeItem('btc.slPlayers2'); } catch { /* old cache formats */ }
-    store.set('btc.slPlayers3', { at: Date.now(), map });
+    try { localStorage.removeItem('btc.slPlayers'); localStorage.removeItem('btc.slPlayers2'); localStorage.removeItem('btc.slPlayers3'); } catch { /* old cache formats */ }
+    store.set('btc.slPlayers4', { at: Date.now(), map });
     return (sl.playerMap = map);
   }
 
